@@ -1,0 +1,14 @@
+Package: AnchoredInversionExamples
+Version: 0.6.8
+Date: 2015-12-1
+Title: Anchored Inversion Examples
+Author: Zepu Zhang <zepu.zhang@gmail.com>
+Maintainer: Zepu Zhang <zepu.zhang@gmail.com>
+Depends:
+    R(>= 2.15.0)
+Imports:
+    AnchoredInversionUtils
+ByteCompile: TRUE
+Description: example code for Anchored Inversion
+License: BSD
+RoxygenNote: 5.0.1
