@@ -236,7 +236,7 @@ save.file.prefix <- 'darcy'
 source('anchor.common.R')
 
 trellis.device(color = TRUE, width = 6, height = 7)
-z <- plot.anchorit.forward.sample(ai.out, x.at = forward.data.x,
+z <- AnchoredInversion::plot.anchorit.forward.sample(ai.out, x.at = forward.data.x,
     xlab = 'X coord')
 print(z)
 
