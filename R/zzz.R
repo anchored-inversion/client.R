@@ -1,6 +1,6 @@
 .onLoad <- function(libname, pkgname)
 {
-    invisible()
+    options(error = utils::recover)
 }
 
 

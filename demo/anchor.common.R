@@ -8,25 +8,11 @@ r <- (n.finish/n.start) ^ (1/(N-1))
 n.samples <- round(n.start * r^(0 : (N-1L)))
 
 
-save.file.prefix <- paste(
-    save.file.prefix,
-    'seed', my.seed,
-    'grid', paste(mygrid$len, collapse = '-'),
-    'data', length(forward.data),
-    'iter', length(n.samples),
-    'tot', sum(n.samples),
-    'start', n.samples[1],
-    'end', n.samples[length(n.samples)],
-    sep = '-')
-
-
 cat('\n')
-cat('RNG seed:', my.seed, '\n')
 cat('field grid:', paste(mygrid$len, sep = ' x '), '\n')
 cat('# of forward data:', length(forward.data), '\n')
 cat('sample sizes:', n.samples, '\n')
 cat('       total:', sum(n.samples), '\n')
-cat('file name prefix:', save.file.prefix, '\n')
 
 v <- AnchoredInversion::init_anchorit(
     grid = mygrid,
@@ -57,7 +43,7 @@ for (iter in seq_along(n.samples))
     stamp <- v$stamp
 
     cat('\nRunning forward model on field realizations... ...\n')
-    forwards <- forward.fun(list(fields))
+    forwards <- lapply(fields, f.forward)
 
     cat('\nSubmitting forward results... ...\n')
     stamp <- AnchoredInversion::submit_anchorit_forwards(
@@ -92,26 +78,5 @@ for (x in AnchoredInversionUtils::unpack.lattice.plots(z)) { x11(); print(x)}
 
 # Plot a few simulations.
 x11()
-print(plot(as.field.ensemble(simulate_anchorit(task_id, n = 3)), field.ref = myfield))
-
-
-
-if (length(mygrid$len) == 1)
-{
-    pdf(file = paste('~/tmp/', save.file.prefix, '.pdf', sep = ''), width = 6, height = 5)
-    print(z)
-    dev.off()
-} else if (length(mygrid$len) == 2)
-{
-    pdf(file = paste('~/tmp/', save.file.prefix, '.pdf', sep = ''), width = 6,
-        height = 10)
-    if (is.null(z$medianrefplot))
-        print(z$medianplot)
-    else
-        print(z$medianrefplot)
-    dev.off()
-}
-
-rm(z, x)   # lattice objects can be big.
-
+print(plot(AnchoredInversion::simulate_anchorit(task_id, n = 3), field.ref = myfield))
 
