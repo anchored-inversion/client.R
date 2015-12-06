@@ -53,7 +53,11 @@ print(xyplot(
 source('anchor.common.R')
 
 trellis.device(color = TRUE, width = 6, height = 7)
-z <- AnchoredInversion::plot.anchorit.forward.sample(ai.out, x.at = forward.data.x,
-    xlab = 'X coord')
+z <- AnchoredInversionUtils::plot.forward.reproduction(
+        forward.data = forward.data,
+        forward.sample = forward.samples,
+        x.at = forward.data.x,
+        xlab = 'X coord')
 print(z)
+
 
