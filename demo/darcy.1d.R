@@ -55,7 +55,9 @@ source('anchor.common.R')
 trellis.device(color = TRUE, width = 6, height = 7)
 z <- AnchoredInversionUtils::plot.forward.reproduction(
         forward.data = forward.data,
-        forward.sample = forward.samples,
+        forward.sample = lapply(
+            lapply(forward.samples, function(v) do.call(rbind, v)),
+            apply, 2, boxplot.stats),
         x.at = forward.data.x,
         xlab = 'X coord')
 print(z)

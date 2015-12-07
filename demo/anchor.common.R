@@ -1,7 +1,7 @@
 
 ####### THE REAL DEAL ##########
 
-N <- 6 #12
+N <- 12
 n.start <- 2000
 n.finish <- 2000
 r <- (n.finish/n.start) ^ (1/(N-1))
@@ -14,7 +14,7 @@ cat('# of forward data:', length(forward.data), '\n')
 cat('sample sizes:', n.samples, '\n')
 cat('       total:', sum(n.samples), '\n')
 
-v <- AnchoredInversion::init_inversion(
+v <- AnchoredInversion::init_model(
         grid = mygrid,
         data_linear = linear.data,
         field_value_range = range(myfield) +
@@ -35,30 +35,34 @@ for (iter in seq_along(n.samples))
 {
     cat('\n=== iteration', iter, '===\n')
 
-    cat('\nRequesting field realizations... ...\n')
-    v <- AnchoredInversion::simulate_fields(
+    forward.sample <- list()
+    while (length(forward.sample) < n.samples[iter])
+    {
+        cat('\nRequesting field realizations... ...\n')
+        v <- AnchoredInversion::request_fields(
+                user_id = user_id,
+                task_id = task_id,
+                n_sim = trunc((n.samples[iter] - length(forward.sample)) * 1.2),
+                stamp = stamp)
+
+        cat('\nRunning forward model on field realizations... ...\n')
+        forwards <- lapply(v$fields, f.forward)
+
+        cat('\nSubmitting forward results... ...\n')
+        stamp <- AnchoredInversion::submit_forwards(
             user_id = user_id,
             task_id = task_id,
-            n_sim = n.samples[iter],
-            stamp = stamp)
-    fields <- v$fields
-    stamp <- v$stamp
+            forward_values = forwards,
+            stamp = v$stamp)
 
-    cat('\nRunning forward model on field realizations... ...\n')
-    forwards <- lapply(fields, f.forward)
+        forward.sample <- c(forward.sample,
+            Filter(function(v) !all(is.na(v)), forwards))
+    }
 
-    cat('\nSubmitting forward results... ...\n')
-    stamp <- AnchoredInversion::submit_forward_values(
-        user_id = user_id,
-        task_id = task_id,
-        forward_values = forwards,
-        stamp = stamp)
-
-    forward.samples <- c(forward.samples,
-        list(Filter(function(x) !all(is.na(x)), forwards)))
+    forward.samples <- c(forward.samples, list(forward.sample))
 
     cat('\nUpdating approx to posterior... ...\n')
-    stamp <- AnchoredInversion::update_inversion(
+    stamp <- AnchoredInversion::update_model(
         user_id = user_id,
         task_id = task_id)
 }
@@ -67,9 +71,9 @@ for (iter in seq_along(n.samples))
 # Summaries
 
 cat('\n')
-AnchoredInversion::summarize_inversion(user_id, task_id)
+AnchoredInversion::summarize_model(user_id, task_id)
 
-z <- AnchoredInversion::plot_inverision(user_id, task_id)
+z <- AnchoredInversion::plot_model(user_id, task_id)
 for (x in AnchoredInversionUtils::unpack.lattice.plots(z)) { x11(); print(x)}
 
 
@@ -77,7 +81,7 @@ for (x in AnchoredInversionUtils::unpack.lattice.plots(z)) { x11(); print(x)}
 
 cat('\n')
 cat('simulating fields...\n')
-myfields <- AnchoredInversion::simulate_inversion(user_id, task_id, n_sim = 1000)
+myfields <- AnchoredInversion::simulate_fields(user_id, task_id, n_sim = 1000)
 z <- plot(summary(AnchoredInversionUtils::field.ensemble(myfields, mygrid), field.ref = myfield))
 for (x in AnchoredInversionUtils::unpack.lattice.plots(z)) { x11(); print(x)}
 
