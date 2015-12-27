@@ -1,3 +1,4 @@
+#' @importFrom futile.logger flog.debug flog.info flog.warn flog.error
 .onLoad <- function(libname, pkgname)
 {
     options(error = utils::recover)

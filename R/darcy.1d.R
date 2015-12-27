@@ -8,9 +8,10 @@ darcy.1d <- function(
     )
 {
     if (is.null(seed))
-        my.seed <- sample(1000, 1)
+        seed <- sample(1000, 1)
         #Tough seed cases: 721, 115
     set.seed(seed)
+    flog.info('set.seed called with parameter seed=%s', seed)
 
     #=================================================================
     # Prepare synthetic field and parameterize the field
