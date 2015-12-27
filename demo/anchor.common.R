@@ -1,7 +1,7 @@
 
 ####### THE REAL DEAL ##########
 
-N <- 12
+N <- 4 #12
 n.start <- 2000
 n.finish <- 2000
 r <- (n.finish/n.start) ^ (1/(N-1))
