@@ -1,6 +1,5 @@
 require(lattice)
 require(fields)
-require(AnchoredInversion)
 require(AnchoredInversionUtils)
 require(AnchoredInversionExamples)
 

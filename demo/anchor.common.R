@@ -1,3 +1,4 @@
+require(AnchoredInversion)
 
 ####### THE REAL DEAL ##########
 
@@ -13,6 +14,7 @@ cat('field grid:', paste(mygrid$len, sep = ' x '), '\n')
 cat('# of forward data:', length(forward.data), '\n')
 cat('sample sizes:', n.samples, '\n')
 cat('       total:', sum(n.samples), '\n')
+cat('\n')
 
 v <- AnchoredInversion::init_model(
         grid = mygrid,
@@ -38,17 +40,20 @@ for (iter in seq_along(n.samples))
     forward.sample <- list()
     while (length(forward.sample) < n.samples[iter])
     {
-        cat('\nRequesting field realizations... ...\n')
+        n_sim <- trunc((n.samples[iter] - length(forward.sample)) * 1.2)
+        cat('\nRequesting', n_sim, 'field realizations... ...\n')
         v <- AnchoredInversion::request_fields(
                 user_id = user_id,
                 task_id = task_id,
-                n_sim = trunc((n.samples[iter] - length(forward.sample)) * 1.2),
+                n_sim = n_sim,
                 stamp = stamp)
 
-        cat('\nRunning forward model on field realizations... ...\n')
+        cat('\nRunning forward model on', length(v$fields), 'field realizations... ...\n')
         forwards <- lapply(v$fields, f.forward)
+        forwards_good <- Filter(function(v) !all(is.na(v)), forwards)
+        cat('\n   ', length(forwards) - length(forwards_good), 'forward results are invalid\n')
 
-        cat('\nSubmitting forward results... ...\n')
+        cat('\nSubmitting', length(forwards), 'forward results (including invalid ones if any)... ...\n')
         stamp <- AnchoredInversion::submit_forwards(
             user_id = user_id,
             task_id = task_id,
@@ -73,20 +78,26 @@ for (iter in seq_along(n.samples))
 cat('\n')
 AnchoredInversion::summarize_model(user_id, task_id)
 
-z <- AnchoredInversion::plot_model(user_id, task_id)
-for (x in AnchoredInversionUtils::unpack.lattice.plots(z)) { x11(); print(x)}
+# TODO: plotting support
+# z <- AnchoredInversion::plot_model(user_id, task_id)
+# for (x in AnchoredInversionUtils::unpack.lattice.plots(z)) { x11(); print(x)}
 
 
 ### Field simulations ###
 
 cat('\n')
-cat('simulating fields...\n')
-myfields <- AnchoredInversion::simulate_fields(user_id, task_id, n_sim = 1000)
-z <- plot(summary(AnchoredInversionUtils::field.ensemble(myfields, mygrid), field.ref = myfield))
-for (x in AnchoredInversionUtils::unpack.lattice.plots(z)) { x11(); print(x)}
+n_sim <= 1000
+cat('Requesting', n_sim, 'field simulations...\n')
+myfields <- AnchoredInversion::simulate_fields(user_id, task_id, n_sim = n_sim)
+cat('Summarizing simulated fields...\n')
+myfields_summary <- summary(AnchoredInversionUtils::field.ensemble(myfields, mygrid), field.ref = myfield)
+# TODO: plotting support
+#z <- plot(myfields_summary)
+#for (x in AnchoredInversionUtils::unpack.lattice.plots(z)) { x11(); print(x)}
 
+# TODO: plotting support
 # Plot a few simulations.
-x11()
-print(plot(field.ensemble(myfields[1:3], mygrid), field.ref = myfield))
+#x11()
+#print(plot(field.ensemble(myfields[1:3], mygrid), field.ref = myfield))
 
 

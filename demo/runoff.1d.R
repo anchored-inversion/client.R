@@ -1,4 +1,3 @@
-require(AnchoredInversion)
 require(AnchoredInversionUtils)
 require(AnchoredInversionExamples)
 require(lattice)
