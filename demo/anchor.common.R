@@ -1,4 +1,7 @@
-require(AnchoredInversion)
+require(httr)
+
+API_URL <- 'http://local_host:8000/api'
+
 
 ####### THE REAL DEAL ##########
 
@@ -15,6 +18,9 @@ cat('# of forward data:', length(forward.data), '\n')
 cat('sample sizes:', n.samples, '\n')
 cat('       total:', sum(n.samples), '\n')
 cat('\n')
+
+task_id <- httr::POST(paste(API_URL, '/create_task', sep=''))
+print(paste('task_id:', task_id))
 
 v <- AnchoredInversion::init_model(
         grid = mygrid,
