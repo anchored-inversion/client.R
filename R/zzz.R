@@ -7,5 +7,6 @@
 
 
 .onUnload <- function(libpath)
-    library.dynam.unload('AnchoredInversionExamples', libpath)
-
+{
+    library.dynam.unload('AnchoredInversionClient', libpath)
+}

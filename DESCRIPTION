@@ -1,7 +1,7 @@
-Package: AnchoredInversionExamples
-Version: 0.6.8
-Date: 2015-12-1
-Title: Anchored Inversion Examples
+Package: AnchoredInversionClient
+Version: 0.7.0
+Date: 2017-07-15
+Title: Anchored Inversion Client and Examples
 Author: Zepu Zhang <zepu.zhang@gmail.com>
 Maintainer: Zepu Zhang <zepu.zhang@gmail.com>
 Depends:

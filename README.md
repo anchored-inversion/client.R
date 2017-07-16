@@ -1,4 +1,5 @@
-R package AnchoredInversionExamples
+R package AnchoredInversionClient
+
 ===================================
 
 Example functions.
