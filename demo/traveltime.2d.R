@@ -1,7 +1,7 @@
 require(lattice)
 require(fields)
 require(AnchoredInversionUtils)
-require(AnchoredInversionExamples)
+require(AnchoredInversionClient)
 
 options(error = utils::recover)
 

@@ -1,8 +1,7 @@
-require(AnchoredInversionExamples)
-# require(lattice)
+require(AnchoredInversionClient)
 require(AnchoredInversionUtils)
 
-darcy.env <- AnchoredInversionExamples::darcy.1d(seed = NULL)
+darcy.env <- AnchoredInversionClient::darcy.1d(seed = NULL)
 attach(darcy.env)
 
 #--- plot the actual field ---
