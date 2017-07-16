@@ -114,8 +114,8 @@ darcy.1d <- function(
                 b1.type = b1.type,
                 b1 = b1,
                 ...),
-            error = function(...) rep(NA, length(x))
-            )
+        error = function(...) rep(NA, length(x))
+        )
     }
 
     f.forward.transform <- function(x, ...)
@@ -132,10 +132,10 @@ darcy.1d <- function(
     {
         x <- f.field.transform(x, rev = TRUE)
 
-        z <- do.call(
-                f.darcy,
-                c(list(x), list(return.idx = forward.data.idx))
-                )
+        z <- f.darcy(x)
+        if (!is.null(forward.data.idx)) {
+            z <- z[forward.data.idx]
+        }
 
         if (any(is.na(z)))
         {

@@ -19,7 +19,6 @@
 #'      \code{source}.
 #' @param b1.type type of downstream boundary condition.
 #' @param b1 value of downstream boundary condition.
-#' @param return.idx indices of grid points to return
 #'
 #' The model domain is discretized uniformly.
 #' \code{K}, \code{s}, \code{h} are all evaluated at the model grids.
@@ -37,8 +36,7 @@ darcy <- function(
     b0.type = c('dirichlet', 'neumann'),
     b0,
     b1.type = c('dirichlet', 'neumann'),
-    b1,
-    return.idx = NULL
+    b1
     )
 {
     b0.type <- match.arg(b0.type)
@@ -92,11 +90,7 @@ darcy <- function(
     h <- solve(A, b)
         # This could fail, if the input conditions are problematic.
 
-    # as.vector(h)
-    if (is.null(return.idx))
-        c(h)
-    else
-        c(h)[return.idx]
+    c(h)
 }
 
 
