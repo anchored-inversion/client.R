@@ -72,7 +72,7 @@ stamp <- do_post('/init_model',
                  cookies = cookies,
                  task_id = task_id,
                  grid = json_dumps(mygrid),
-                 #data_linear=json_dumps(data_linear)  # TODO
+                 data_linear=json_dumps(linear.data),
                  field_value_range = json_dumps(field_value_range),
                  data_forward = json_dumps(forward.data)
                  )
