@@ -7,7 +7,9 @@ Maintainer: Zepu Zhang <zepu.zhang@gmail.com>
 Depends:
     R(>= 2.15.0)
 Imports:
-    futile.logger
+    futile.logger,
+    httr,
+    jsonlite
 ByteCompile: TRUE
 Description: example code for Anchored Inversion
 License: BSD
