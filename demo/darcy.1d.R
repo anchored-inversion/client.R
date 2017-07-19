@@ -1,5 +1,4 @@
 require(AnchoredInversionClient)
-require(AnchoredInversionUtils)
 
 darcy.env <- AnchoredInversionClient::darcy.1d(seed = NULL)
 attach(darcy.env)
@@ -9,7 +8,7 @@ attach(darcy.env)
 # trellis.device(color = FALSE, width = 5, height = 4)
 # print(xyplot(
 #     f.field.transform(myfield, rev = TRUE)
-#         ~ AnchoredInversionUtils::grid.fullxyz(mygrid),
+#         ~ AnchoredInversionClient::grid.fullxyz(mygrid),
 #     type = 'l',
 #     xlab = 'X',
 #     ylab = 'Conductivity')
@@ -17,7 +16,7 @@ attach(darcy.env)
 # 
 # trellis.device(color = FALSE, width = 5, height = 4)
 # print(xyplot(
-#     myfield ~ AnchoredInversionUtils::grid.fullxyz(mygrid),
+#     myfield ~ AnchoredInversionClient::grid.fullxyz(mygrid),
 #     type = 'l',
 #     xlab = 'X',
 #     ylab = 'Log conductivity')
@@ -26,7 +25,7 @@ attach(darcy.env)
 #--- plot the forward process and measurements ---
 
 # forward.curve <- list(
-#     x = AnchoredInversionUtils::grid.fullxyz(mygrid),
+#     x = AnchoredInversionClient::grid.fullxyz(mygrid),
 #     y = f.darcy(f.field.transform(myfield, rev = TRUE))
 #     )
 

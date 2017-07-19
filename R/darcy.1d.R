@@ -38,7 +38,7 @@ darcy.1d <- function(
     data(Denali)
     i <- sample(length(Denali$data) - 400, 1)
     myfield <- Denali$data[i : (i+400)]
-    myfield <- AnchoredInversionUtils::average.line(myfield, 4) $y
+    myfield <- average.line(myfield, 4) $y
 
     lb <- K.xmin + runif(1) * (K.my.mean - K.xmin)/2
         # Min value of synthetic data.
@@ -52,7 +52,7 @@ darcy.1d <- function(
     myfield <- lb + (myfield - min(myfield)) * b
 
     f.field.transform <- function(x, reverse = FALSE) {
-        AnchoredInversionUtils::log.transform(x, reverse = reverse, lower = K.xmin)
+        log.transform(x, reverse = reverse, lower = K.xmin)
     }
 
     myfield <- f.field.transform(myfield)
@@ -119,7 +119,7 @@ darcy.1d <- function(
     }
 
     f.forward.transform <- function(x, ...)
-        AnchoredInversionUtils::logit.transform(x, lower = -.01, upper = 1.01, ...)
+        logit.transform(x, lower = -.01, upper = 1.01, ...)
 
     stopifnot(n.forward < mygrid$len / 3)
     forward.data.idx <- seq(from = 1, to = mygrid$len, len = n.forward + 2)
@@ -157,7 +157,7 @@ darcy.1d <- function(
         # Forward data.
     forward.data.groups <- NULL
 
-    forward.data.x <- AnchoredInversionUtils::grid.ijk2xyz(mygrid, forward.data.idx)
+    forward.data.x <- grid.ijk2xyz(mygrid, forward.data.idx)
     forward.data.y <- f.forward.transform(forward.data, rev = TRUE)
 
     list(

@@ -1,13 +1,12 @@
 Package: AnchoredInversionClient
-Version: 0.7.0
-Date: 2017-07-15
+Version: 0.7.1
+Date: 2017-07-18
 Title: Anchored Inversion Client and Examples
 Author: Zepu Zhang <zepu.zhang@gmail.com>
 Maintainer: Zepu Zhang <zepu.zhang@gmail.com>
 Depends:
     R(>= 2.15.0)
 Imports:
-    AnchoredInversionUtils,
     futile.logger
 ByteCompile: TRUE
 Description: example code for Anchored Inversion

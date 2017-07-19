@@ -1,6 +1,4 @@
 require(lattice)
-require(fields)
-require(AnchoredInversionUtils)
 require(AnchoredInversionClient)
 
 options(error = utils::recover)
@@ -29,7 +27,7 @@ myfield <- myfield[d1 : (d1+NX), d2 : (d2+NY)]
 #myfield <- Appalachian$data
 
 if (NXY.smoothing > 1)
-    myfield <- fields::average.image(myfield, NXY.smoothing) $ z
+    myfield <- AnchoredInversionClient::average.image(myfield, NXY.smoothing) $ z
 
 mygrid <- list(
     from = c(0, 0),
@@ -48,7 +46,7 @@ myfield <- myfield / mean(myfield) * (1/5000 + 1/8000)/2
     # this range.
 
 f.field.transform <- function(x, reverse = FALSE)
-    AnchoredInversionUtils::log.transform(x, lower = 1e-10, reverse = reverse)
+    AnchoredInversionClient::log.transform(x, lower = 1e-10, reverse = reverse)
 
 myfield <- f.field.transform(myfield)
 
@@ -176,7 +174,7 @@ f.forward <- function(x,
 
 # Transform forward data to real line.
 f.forward.transform <- function(x, reverse = FALSE)
-    AnchoredInversionUtils::log.transform(x, lower = 1e-10, reverse = reverse)
+    AnchoredInversionClient::log.transform(x, lower = 1e-10, reverse = reverse)
 
 myfield.full <- myfield
 mygrid.full <- mygrid
@@ -220,7 +218,7 @@ forward.fun <- function(x) { do.call(f.forward, c(x, forward.args)) }
 
 #--- plot the actual field and data locations ---
 
-xy <- AnchoredInversionUtils::grid.fullxyz(mygrid.full)
+xy <- AnchoredInversionClient::grid.fullxyz(mygrid.full)
 col.cuts <- 99
 dd <- diff(range(myfield)) * .2
 col.at <- seq(min(myfield) - dd, max(myfield) + dd,
@@ -251,7 +249,7 @@ print(levelplot(
     main = 'Synthetic field'
     ))
 
-xy <- AnchoredInversionUtils::grid.fullxyz(mygrid)
+xy <- AnchoredInversionClient::grid.fullxyz(mygrid)
 trellis.device(color = TRUE, width = 9, height = 6)
 print(levelplot(
     c(myfield) ~ xy[, 1] * xy[, 2],

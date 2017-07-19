@@ -1,5 +1,4 @@
-require(AnchoredInversionUtils)
-require(AnchoredInversionExamples)
+require(AnchoredInversionClient)
 require(lattice)
 
 options(error = utils::recover)
@@ -42,7 +41,7 @@ myfield <- myfield / mean(myfield) * .02
 
 
 f.field.transform <- function(x, reverse = FALSE)
-    AnchoredInversionUtils::log.transform(x, lower = 1e-10, reverse = reverse)
+    AnchoredInversionClient::log.transform(x, lower = 1e-10, reverse = reverse)
 
 myfield <- f.field.transform(myfield)
 
@@ -163,9 +162,9 @@ f.runoff <- function(
 f.forward.transform <- function(x, reverse = FALSE)
 {
     if (reverse)
-        AnchoredInversionUtils::log.transform(x, reverse = TRUE) + 1e-100
+        AnchoredInversionClient::log.transform(x, reverse = TRUE) + 1e-100
     else
-        AnchoredInversionUtils::log.transform(x + 1e-100)
+        AnchoredInversionClient::log.transform(x + 1e-100)
             # Guard against '0' values in 'x'.
 }
 
@@ -173,8 +172,7 @@ f.forward <- function(
     x, # 'x' is a list of fields in the _transformed_ unit.
     grid,
     forward.config,
-    runoff.config,
-    parallel = AI.getOptions('parallel')
+    runoff.config
     )
 {
     x.is.list <- is.list(x)
@@ -226,7 +224,7 @@ forward.data.groups <- as.factor(do.call(c, forward.data.groups))
 
 trellis.device(color = FALSE, width = 5, height = 4)
 print(xyplot(
-    f.field.transform(myfield, rev = TRUE) ~ AnchoredInversionUtils::grid.fullxyz(mygrid),
+    f.field.transform(myfield, rev = TRUE) ~ AnchoredInversionClient::grid.fullxyz(mygrid),
     type = 'l',
     xlab = 'X',
     ylab = 'Roughness')
@@ -234,7 +232,7 @@ print(xyplot(
 
 trellis.device(color = FALSE, width = 5, height = 4)
 print(xyplot(
-    myfield ~ grid.fullxyz(mygrid),
+    myfield ~ anchoredInversionClient::grid.fullxyz(mygrid),
     type = 'l',
     xlab = 'X',
     ylab = 'Log roughness')
