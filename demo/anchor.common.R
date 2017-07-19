@@ -133,7 +133,9 @@ for (iter in seq_along(n.samples))
 
 
 # Summaries
-# TODO: get and print summary
+summ <- do_post('/summarize_task', cookies=cookies, task_id=task_id)
+summ <- json_loads(summ)
+print.summary(summ)
 
 
 ### Field simulations ###
