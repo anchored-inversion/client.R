@@ -60,5 +60,5 @@ cat('Requesting', n_sim, 'field simulations...\n')
 simulations <- AnchoredInversionClient::simulate_fields(n_sim, task_id=task_id, cookies=cookies)
 
 #cat('Summarizing simulated fields...\n')
-#myfields_summary <- summary(AnchoredInversionUtils::field.ensemble(myfields, mygrid), field.ref = myfield)
+#myfields_summary <- summary(BayesKrig::field.ensemble(myfields, mygrid), field.ref = myfield)
 
