@@ -51,7 +51,7 @@ attach(darcy.env)
 source('anchor.common.R')
 
 # trellis.device(color = TRUE, width = 6, height = 7)
-# z <- AnchoredInversionUtils::plot.forward.reproduction(
+# z <- BayesKrig::plot.forward.reproduction(
 #         forward.data = forward.data,
 #         forward.sample = lapply(
 #             lapply(forward.samples, function(v) do.call(rbind, v)),
