@@ -1,4 +1,5 @@
 require(AnchoredInversionClient)
+options(error = utils::recover)
 
 darcy.env <- AnchoredInversionClient::darcy.1d(seed = NULL)
 attach(darcy.env)

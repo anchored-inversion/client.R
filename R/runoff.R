@@ -29,8 +29,8 @@
 #'      Flow velocity can be obtained as \code{discharge / flowdepth}.
 #'
 #' @export
-#' @useDynLib AnchoredInversionExamples f_runoff_1d
-runoff.1d <- function(
+#' @useDynLib AnchoredInversionClient f_runoff_1d
+runoff <- function(
     dx, nx, dt, nt,
     h0 = 0, q0 = 0, qt.ub = 0,
     rain, rough, s0,

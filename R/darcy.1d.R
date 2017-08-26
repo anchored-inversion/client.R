@@ -154,7 +154,6 @@ darcy.1d <- function(
     }
 
     forward.data <- f.forward(myfield)
-        # Forward data.
     forward.data.groups <- NULL
 
     forward.data.x <- grid.ijk2xyz(mygrid, forward.data.idx)

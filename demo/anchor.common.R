@@ -1,6 +1,6 @@
 N <- 4 #12
-n.start <- 2000
-n.finish <- 2000
+n.start <- 1000 #2000
+n.finish <- 1000 #2000
 r <- (n.finish/n.start) ^ (1/(N-1))
 n.samples <- round(n.start * r^(0 : (N-1L)))
 
@@ -17,7 +17,7 @@ cookies <- AnchoredInversionClient::open_session()
 
 cat('Creating a new task...\n')
 task_id <- AnchoredInversionClient::create_task(cookies)
-#cat('    task_id:', task_id, '\n')
+cat('    task_id:', task_id, '\n')
 
 field_value_range = range(myfield) +
     c(-1, 1) * runif(2, 2, 10) * diff(range(myfield))
@@ -53,6 +53,8 @@ for (iter in seq_along(n.samples))
 summ <- AnchoredInversionClient::summarize_task(task_id=task_id, cookies=cookies)
 AnchoredInversionClient::print.summary(summ)
 
+z <- AnchoredInversionClient::visualize_task(task_id=task_id, cookies=cookies)
+print(z)
 
 cat('\n')
 n_sim <- 1000

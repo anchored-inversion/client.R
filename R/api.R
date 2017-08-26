@@ -33,6 +33,7 @@ do_post <- function(url, cookies=NULL, ...) {
 }
 
 
+#' @export
 open_session <- function(user_id='abc', user_email='demo@anchored-inversion.com')
 {
     z <- do_post('/open_session', user_id=user_id, user_email=user_email)
@@ -40,6 +41,7 @@ open_session <- function(user_id='abc', user_email='demo@anchored-inversion.com'
 }
 
 
+#' @export
 create_task <- function(cookies)
 {
     task_id <- do_post('/create_task', cookies=cookies)
@@ -47,20 +49,34 @@ create_task <- function(cookies)
 }
 
 
+#' @export
 init_model <- function(task_id, mygrid, field_value_range, forward.data, linear.data, cookies)
 {
-    stamp <- do_post('/init_model',
-                     cookies = cookies,
-                     task_id = task_id,
-                     grid = json_dumps(mygrid),
-                     data_linear=json_dumps(linear.data),
-                     field_value_range = json_dumps(field_value_range),
-                     data_forward = json_dumps(forward.data)
-                     )
+    if (is.null(linear.data)) {
+        stamp <- do_post(
+                 '/init_model',
+                 cookies = cookies,
+                 task_id = task_id,
+                 grid = json_dumps(mygrid),
+                 field_value_range = json_dumps(field_value_range),
+                 data_forward = json_dumps(forward.data)
+                 )
+    } else {
+        stamp <- do_post(
+                 '/init_model',
+                 cookies = cookies,
+                 task_id = task_id,
+                 grid = json_dumps(mygrid),
+                 field_value_range = json_dumps(field_value_range),
+                 data_linear = json_dumps(linear.data),
+                 data_forward = json_dumps(forward.data)
+                 )
+    }
     stamp
 }
 
 
+#' @export
 update_model <- function(n.samples, task_id, f.forward, cookies, stamp)
 {
     n.samp <- 0
@@ -107,6 +123,7 @@ update_model <- function(n.samples, task_id, f.forward, cookies, stamp)
 }
 
 
+#' @export
 summarize_task <- function(task_id, cookies)
 {
     summ <- do_post('/summarize_task', cookies=cookies, task_id=task_id)
@@ -114,6 +131,15 @@ summarize_task <- function(task_id, cookies)
 }
 
 
+#' @export
+visualize_task <- function(task_id, cookies)
+{
+    msg <- do_post('/visualize_task', cookies=cookies, task_id=task_id)
+    msg
+}
+
+
+#' @export
 simulate_fields <- function(n, task_id, cookies)
 {
     z <- do_post('/simulate', cookies=cookies, task_id=task_id, n=n)

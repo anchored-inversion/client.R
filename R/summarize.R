@@ -3,7 +3,8 @@
 #' @param digits passed on to \code{print}.
 #' @param \dots additional arguments to \code{print}.
 #'
-print.summary <- function(obj, digits = 3, ...)
+#' @export
+print_summary <- function(obj, digits = 3, ...)
 {
     cat('Dimensions of model grid:', paste(obj$grid.dim, sep = ' x '), '\n')
 

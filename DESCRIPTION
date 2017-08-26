@@ -13,4 +13,4 @@ Imports:
 ByteCompile: TRUE
 Description: example code for Anchored Inversion
 License: BSD
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

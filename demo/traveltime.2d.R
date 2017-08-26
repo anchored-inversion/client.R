@@ -1,6 +1,5 @@
-require(lattice)
 require(AnchoredInversionClient)
-
+require(lattice)
 options(error = utils::recover)
 
 my.seed <- sample(1000, 1)
@@ -198,7 +197,7 @@ forward.data <- do.call(f.forward,
 
 forward.data.groups <- NULL
 
-z <- average.image(list(
+z <- AnchoredInversionClient::average.image(list(
         x = do.call(seq, lapply(mygrid.full, '[[', 1)),
         y = do.call(seq, lapply(mygrid.full, '[[', 2)),
         z = myfield.full),
@@ -214,59 +213,59 @@ myfield <- z$z
 forward.args <- modifyList(forward.args.full, list(grid = mygrid))
 
 forward.fun <- function(x) { do.call(f.forward, c(x, forward.args)) }
-
+f.forward <- forward.fun
 
 #--- plot the actual field and data locations ---
 
-xy <- AnchoredInversionClient::grid.fullxyz(mygrid.full)
-col.cuts <- 99
-dd <- diff(range(myfield)) * .2
-col.at <- seq(min(myfield) - dd, max(myfield) + dd,
-    length = col.cuts)
-    # Take the range of 'myfield', not 'myfield.full'.
-    # This will make 'plot.fields.summary' easier.
-trellis.device(color = TRUE, width = 9, height = 6)
-print(levelplot(
-    c(myfield.full) ~ xy[, 1] * xy[, 2],
-    panel = function(...) {
-            panel.levelplot(...)
-            panel.points(
-                c(sources.left[,1], sources.right[,1]),
-                c(sources.left[,2], sources.right[,2]),
-                pch = 19, col = 'black')
-            panel.points(
-                c(receivers.left[,1], receivers.right[,1],
-                    receivers.top[,1]),
-                c(receivers.left[,2], receivers.right[,2],
-                    receivers.top[,2]),
-                pch = 1, col = 'black')
-        },
-    col.regions = terrain.colors(col.cuts + 1),
-    cuts = col.cuts,
-    at = col.at,
-    xlab = 'X1 (Left -- Right)',
-    ylab = 'X2 (Bottom -- Top)',
-    main = 'Synthetic field'
-    ))
-
-xy <- AnchoredInversionClient::grid.fullxyz(mygrid)
-trellis.device(color = TRUE, width = 9, height = 6)
-print(levelplot(
-    c(myfield) ~ xy[, 1] * xy[, 2],
-    col.regions = terrain.colors(col.cuts + 1),
-    cuts = col.cuts,
-    at = col.at,
-    xlab = 'X1 (Left -- Right)',
-    ylab = 'X2 (Bottom -- Top)',
-    main = 'Aggregated field'
-    ))
+# xy <- AnchoredInversionClient::grid.fullxyz(mygrid.full)
+# col.cuts <- 99
+# dd <- diff(range(myfield)) * .2
+# col.at <- seq(min(myfield) - dd, max(myfield) + dd,
+#     length = col.cuts)
+#     # Take the range of 'myfield', not 'myfield.full'.
+#     # This will make 'plot.fields.summary' easier.
+# trellis.device(color = TRUE, width = 9, height = 6)
+# print(levelplot(
+#     c(myfield.full) ~ xy[, 1] * xy[, 2],
+#     panel = function(...) {
+#             panel.levelplot(...)
+#             panel.points(
+#                 c(sources.left[,1], sources.right[,1]),
+#                 c(sources.left[,2], sources.right[,2]),
+#                 pch = 19, col = 'black')
+#             panel.points(
+#                 c(receivers.left[,1], receivers.right[,1],
+#                     receivers.top[,1]),
+#                 c(receivers.left[,2], receivers.right[,2],
+#                     receivers.top[,2]),
+#                 pch = 1, col = 'black')
+#         },
+#     col.regions = terrain.colors(col.cuts + 1),
+#     cuts = col.cuts,
+#     at = col.at,
+#     xlab = 'X1 (Left -- Right)',
+#     ylab = 'X2 (Bottom -- Top)',
+#     main = 'Synthetic field'
+#     ))
+# 
+# xy <- AnchoredInversionClient::grid.fullxyz(mygrid)
+# trellis.device(color = TRUE, width = 9, height = 6)
+# print(levelplot(
+#     c(myfield) ~ xy[, 1] * xy[, 2],
+#     col.regions = terrain.colors(col.cuts + 1),
+#     cuts = col.cuts,
+#     at = col.at,
+#     xlab = 'X1 (Left -- Right)',
+#     ylab = 'X2 (Bottom -- Top)',
+#     main = 'Aggregated field'
+#     ))
 
 
 #------------------------------------
 # Model inference, summary, plotting.
 #------------------------------------
 
-save.file.prefix <- 'traveltime'
+#save.file.prefix <- 'traveltime'
 
 source('anchor.common.R')
 

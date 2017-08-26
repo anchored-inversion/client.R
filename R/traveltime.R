@@ -25,7 +25,7 @@
 #'      \code{flag}.
 #'
 #' @export
-#' @useDynLib AnchoredInversionExamples c_travel_time_2d
+#' @useDynLib AnchoredInversionClient c_travel_time_2d
 traveltime.2d <- function(
     grid, slowness, xy.source, xy.detectors = NULL,
     inner.radius = 3
