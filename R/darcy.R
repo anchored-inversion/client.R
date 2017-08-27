@@ -28,7 +28,7 @@
 #'
 #' @references
 #'  Schwartz and Zhang, Fundamentals of Ground Water, Wiley, 2003.
-#' @export
+#'
 darcy <- function(
     K,
     dx,
@@ -94,13 +94,13 @@ darcy <- function(
 }
 
 
-K.xmin <- 1e-10
 # Lower boundary of possible value.
 # Specify this lower boundary to avoid generating essentially
 # '0' conductivity, which will fail the Darcy equation.
 # This is not only a concern in synthetic studies.
 # In real applications, this is a config value used in
 # the field transform function.
+K.xmin <- 1e-10
 
 
 darcy.forward.transform <- function(x, ...) {
@@ -108,6 +108,11 @@ darcy.forward.transform <- function(x, ...) {
 }
 
 
+# Another important element is to define how the actual field
+# should be transformed to make it take value in (-infty, infty).
+# A common transformation is log.
+#
+#' @export
 darcy.field.transform <- function(x, reverse = FALSE) {
     log.transform(x, reverse = reverse, lower = K.xmin)
 }
@@ -126,7 +131,11 @@ darcy.field.transform <- function(x, reverse = FALSE) {
 # numerical code. It may be necessary to use intermediate files
 # for data storage and transfer. Fixed initial and boundary conditions
 # also need to be handled.
-darcy.f.forward <- function(x, mygrid, forward.data.idx = NULL)
+#
+# The following function creates the forward function.
+#
+#' @export
+make.darcy.forward.function <- function(mygrid, forward.data.idx = NULL)
 {
     f.darcy <- function(
         x,
@@ -149,57 +158,44 @@ darcy.f.forward <- function(x, mygrid, forward.data.idx = NULL)
         )
     }
 
-    x <- darcy.field.transform(x, rev = TRUE)
+    # This is the forward function with some config
+    # stored in closure.
+    function(x) {
+        x <- darcy.field.transform(x, rev = TRUE)
 
-    z <- f.darcy(x)
-    if (!is.null(forward.data.idx)) {
-        z <- z[forward.data.idx]
-    }
+        z <- f.darcy(x)
+        if (!is.null(forward.data.idx)) {
+            z <- z[forward.data.idx]
+        }
 
-    if (any(is.na(z)))
-    {
-        rep(NA, length(z))
-    } else
-    {
-        z <- unname(darcy.forward.transform(z))
-        if (any(!is.finite(z)))
-            # If this happens, the input field
-            # must be crazy and the darcy output
-            # is unreasonable.
+        if (any(is.na(z)))
+        {
             rep(NA, length(z))
-        else
-            z
+        } else
+        {
+            z <- unname(darcy.forward.transform(z))
+            if (any(!is.finite(z)))
+                # If this happens, the input field
+                # must be crazy and the darcy output
+                # is unreasonable.
+                rep(NA, length(z))
+            else
+                z
+        }
     }
 }
 
 
-#' Set up environments for a 1-D Darcy example application.
-#'
+# Prepare synthetic field and parameterize the field
+# by geostatistical formulations.
+# Synthetic field is used to check the result;
+# in applications we do not have such 'synthetic' (ie real) field.
+# Geostat parameterization is reflected in 'corr.args'
+# and in 'mygrid'.
+#
 #' @export
-darcy.1d <- function(
-    n.linear.data = 1,
-    n.forward = 12,
-    seed = NULL
-    )
+make.darcy.field <- function()
 {
-    if (is.null(seed))
-        seed <- sample(1000, 1)
-        #Tough seed cases: 721, 115
-    set.seed(seed)
-    flog.info('set.seed called with parameter seed=%s', seed)
-
-    #=================================================================
-    # Prepare synthetic field and parameterize the field
-    # by geostatistical formulations.
-    # Synthetic field is used to check the result;
-    # in applications we do not have such 'synthetic' (ie real) field.
-    # Geostat parameterization is reflected in 'corr.args'
-    # and in 'mygrid'.
-    # Another important element is to define how the actual field
-    # should be transformed to make it take value in (-infty, infty).
-    # A common transformation is log.
-    #---------------
-
     K.my.mean <- 1e-5
         # Mean value of synthetic field.
         # Choose a value that makes the synthetic data
@@ -222,52 +218,27 @@ darcy.1d <- function(
     b <- (K.my.mean - lb) / (mean(myfield) - min(myfield))
     myfield <- lb + (myfield - min(myfield)) * b
 
-    myfield <- darcy.field.transform(myfield)
+    darcy.field.transform(myfield)
+}
 
-    mygrid <- list(
-        from = .5,
-        by = 1,
-        len = length(myfield)
-        )
 
-    #====================================================
-    # Prepare linear grid data, that is, linear functions
-    # of the field on the numerical grid, such as direct
-    # measurements. Such data may or may not be available
-    # in actual applications.
-    #----------------
-
-    if (n.linear.data < 1)
+# Prepare linear grid data, that is, linear functions
+# of the field on the numerical grid, such as direct
+# measurements. Such data may or may not be available
+# in actual applications.
+#
+#' @export
+make.darcy.linear.data <- function(mygrid, myfield, n.linear)
+{
+    if (n.linear < 1)
     {
-        linear.data <- NULL
+        NULL
     } else
     {
-        stopifnot(n.linear.data < mygrid$len / 10)
-        linear.data <- lapply(
-            sample(length(myfield), n.linear.data),
+        stopifnot(n.linear < mygrid$len / 10)
+        lapply(
+            sample(length(myfield), n.linear),
             function(idx) list(points = idx, value = myfield[idx]))
     }
-
-    stopifnot(n.forward < mygrid$len / 3)
-    forward.data.idx <- seq(from = 1, to = mygrid$len, len = n.forward + 2)
-    forward.data.idx <- round(forward.data.idx[2 : (n.forward + 1)])
-        # Uniform sampling
-    #forward.data.idx <- sample(3 : (mygrid$len - 2), n.forward, replace = FALSE)
-        # Random sampling
-
-    forward.data <- f.forward(myfield)
-
-    forward.data.x <- grid.ijk2xyz(mygrid, forward.data.idx)
-    forward.data.y <- darcy.forward.transform(forward.data, rev = TRUE)
-
-    list(
-        mygrid = mygrid,
-        myfield = myfield,
-        f.darcy = f.darcy,
-        f.forward = f.forward,
-        forward.data.x = forward.data.x,
-        forward.data.y = forward.data.y,
-        forward.data = forward.data,
-        linear.data = linear.data
-        )
 }
+
