@@ -56,6 +56,9 @@ AnchoredInversionClient::print.summary(summ)
 z <- AnchoredInversionClient::visualize_task(task_id=task_id, cookies=cookies)
 print(z)
 
+z <- AnchoredInversionClient::showcase_task(task_id=task_id, cookies=cookies)
+print(z)
+
 cat('\n')
 n_sim <- 1000
 cat('Requesting', n_sim, 'field simulations...\n')
