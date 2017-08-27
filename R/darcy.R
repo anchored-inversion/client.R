@@ -94,6 +94,84 @@ darcy <- function(
 }
 
 
+K.xmin <- 1e-10
+# Lower boundary of possible value.
+# Specify this lower boundary to avoid generating essentially
+# '0' conductivity, which will fail the Darcy equation.
+# This is not only a concern in synthetic studies.
+# In real applications, this is a config value used in
+# the field transform function.
+
+
+darcy.forward.transform <- function(x, ...) {
+    logit.transform(x, lower = -.01, upper = 1.01, ...)
+}
+
+
+darcy.field.transform <- function(x, reverse = FALSE) {
+    log.transform(x, reverse = reverse, lower = K.xmin)
+}
+
+
+# Define forward function and prepare forward data.
+# The forward function takes a random field
+# and returns corresponding output.
+# An important element is how to transform the physical outcome
+# onto (-infty, infty). This transformation is regarded as part
+# of the forward function.
+# This transformation should be performed on the actual measurement
+# as well.
+#
+# In applications, this step typically will require calling a non-R
+# numerical code. It may be necessary to use intermediate files
+# for data storage and transfer. Fixed initial and boundary conditions
+# also need to be handled.
+darcy.f.forward <- function(x, mygrid, forward.data.idx = NULL)
+{
+    f.darcy <- function(
+        x,
+        b0.type = 'dirichlet',
+        b0 = 1,
+        b1.type = 'dirichlet',
+        b1 = 0,
+        ...)
+    {
+        tryCatch(
+            darcy(
+                K = x,
+                dx = mygrid$by,
+                b0.type = b0.type,
+                b0 = b0,
+                b1.type = b1.type,
+                b1 = b1,
+                ...),
+        error = function(...) rep(NA, length(x))
+        )
+    }
+
+    x <- darcy.field.transform(x, rev = TRUE)
+
+    z <- f.darcy(x)
+    if (!is.null(forward.data.idx)) {
+        z <- z[forward.data.idx]
+    }
+
+    if (any(is.na(z)))
+    {
+        rep(NA, length(z))
+    } else
+    {
+        z <- unname(darcy.forward.transform(z))
+        if (any(!is.finite(z)))
+            # If this happens, the input field
+            # must be crazy and the darcy output
+            # is unreasonable.
+            rep(NA, length(z))
+        else
+            z
+    }
+}
+
 
 #' Set up environments for a 1-D Darcy example application.
 #'
@@ -122,10 +200,6 @@ darcy.1d <- function(
     # A common transformation is log.
     #---------------
 
-    K.xmin <- 1e-10
-        # Lower boundary of possible value.
-        # Specify this lower boundary to avoid generating essentially
-        # '0' conductivity, which will fail the Darcy equation.
     K.my.mean <- 1e-5
         # Mean value of synthetic field.
         # Choose a value that makes the synthetic data
@@ -148,11 +222,7 @@ darcy.1d <- function(
     b <- (K.my.mean - lb) / (mean(myfield) - min(myfield))
     myfield <- lb + (myfield - min(myfield)) * b
 
-    f.field.transform <- function(x, reverse = FALSE) {
-        log.transform(x, reverse = reverse, lower = K.xmin)
-    }
-
-    myfield <- f.field.transform(myfield)
+    myfield <- darcy.field.transform(myfield)
 
     mygrid <- list(
         from = .5,
@@ -178,46 +248,6 @@ darcy.1d <- function(
             function(idx) list(points = idx, value = myfield[idx]))
     }
 
-    #=================================================================
-    # Define forward function and prepare forward data.
-    # The forward function takes a random field
-    # and returns corresponding output.
-    # An important element is how to transform the physical outcome
-    # onto (-infty, infty). This transformation is regarded as part
-    # of the forward function.
-    # This transformation should be performed on the actual measurement
-    # as well.
-    #
-    # In applications, this step typically will require calling a non-R
-    # numerical code. It may be necessary to use intermediate files
-    # for data storage and transfer. Fixed initial and boundary conditions
-    # also need to be handled.
-    #--------------------------
-
-    f.darcy <- function(
-        x,
-        b0.type = 'dirichlet',
-        b0 = 1,
-        b1.type = 'dirichlet',
-        b1 = 0,
-        ...)
-    {
-        tryCatch(
-            darcy(
-                K = x,
-                dx = mygrid$by,
-                b0.type = b0.type,
-                b0 = b0,
-                b1.type = b1.type,
-                b1 = b1,
-                ...),
-        error = function(...) rep(NA, length(x))
-        )
-    }
-
-    f.forward.transform <- function(x, ...)
-        logit.transform(x, lower = -.01, upper = 1.01, ...)
-
     stopifnot(n.forward < mygrid$len / 3)
     forward.data.idx <- seq(from = 1, to = mygrid$len, len = n.forward + 2)
     forward.data.idx <- round(forward.data.idx[2 : (n.forward + 1)])
@@ -225,48 +255,19 @@ darcy.1d <- function(
     #forward.data.idx <- sample(3 : (mygrid$len - 2), n.forward, replace = FALSE)
         # Random sampling
 
-    f.forward <- function(x)
-    {
-        x <- f.field.transform(x, rev = TRUE)
-
-        z <- f.darcy(x)
-        if (!is.null(forward.data.idx)) {
-            z <- z[forward.data.idx]
-        }
-
-        if (any(is.na(z)))
-        {
-            rep(NA, length(z))
-        } else
-        {
-            z <- unname(f.forward.transform(z))
-            if (any(!is.finite(z)))
-                # If this happens, the input field
-                # must be crazy and the darcy output
-                # is unreasonable.
-                rep(NA, length(z))
-            else
-                z
-        }
-    }
-
     forward.data <- f.forward(myfield)
-    forward.data.groups <- NULL
 
     forward.data.x <- grid.ijk2xyz(mygrid, forward.data.idx)
-    forward.data.y <- f.forward.transform(forward.data, rev = TRUE)
+    forward.data.y <- darcy.forward.transform(forward.data, rev = TRUE)
 
     list(
         mygrid = mygrid,
         myfield = myfield,
-        f.field.transform = f.field.transform,
         f.darcy = f.darcy,
         f.forward = f.forward,
-        f.forward.transform = f.forward.transform,
         forward.data.x = forward.data.x,
         forward.data.y = forward.data.y,
         forward.data = forward.data,
-        forward.data.groups = forward.data.groups,
         linear.data = linear.data
         )
 }

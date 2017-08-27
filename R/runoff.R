@@ -326,20 +326,6 @@ runoff.1d <- function(
 
     forward.data <- f.forward(myfield)
 
-    # forward.data.groups is to help plotting.
-    forward.data.groups <- lapply(
-        seq_along(forward.config),
-        function(i) {
-            paste(
-                rep(names(forward.config[[i]]),
-                    sapply(forward.config[[i]],
-                        function(x) prod(sapply(x, length)))
-                    ),
-                i)
-            }
-        )
-    forward.data.groups <- as.factor(do.call(c, forward.data.groups))
-
     list(
         mygrid = mygrid,
         myfield = myfield,
@@ -347,7 +333,6 @@ runoff.1d <- function(
         f.forward = f.forward,
         f.forward.transform = f.forward.transform,
         forward.data = forward.data,
-        forward.data.groups = forward.data.groups,
         linear.data = linear.data
     )
 }
