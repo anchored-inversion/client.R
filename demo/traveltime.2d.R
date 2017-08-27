@@ -215,57 +215,13 @@ forward.args <- modifyList(forward.args.full, list(grid = mygrid))
 forward.fun <- function(x) { do.call(f.forward, c(x, forward.args)) }
 f.forward <- forward.fun
 
-#--- plot the actual field and data locations ---
 
-# xy <- AnchoredInversionClient::grid.fullxyz(mygrid.full)
-# col.cuts <- 99
-# dd <- diff(range(myfield)) * .2
-# col.at <- seq(min(myfield) - dd, max(myfield) + dd,
-#     length = col.cuts)
-#     # Take the range of 'myfield', not 'myfield.full'.
-#     # This will make 'plot.fields.summary' easier.
-# trellis.device(color = TRUE, width = 9, height = 6)
-# print(levelplot(
-#     c(myfield.full) ~ xy[, 1] * xy[, 2],
-#     panel = function(...) {
-#             panel.levelplot(...)
-#             panel.points(
-#                 c(sources.left[,1], sources.right[,1]),
-#                 c(sources.left[,2], sources.right[,2]),
-#                 pch = 19, col = 'black')
-#             panel.points(
-#                 c(receivers.left[,1], receivers.right[,1],
-#                     receivers.top[,1]),
-#                 c(receivers.left[,2], receivers.right[,2],
-#                     receivers.top[,2]),
-#                 pch = 1, col = 'black')
-#         },
-#     col.regions = terrain.colors(col.cuts + 1),
-#     cuts = col.cuts,
-#     at = col.at,
-#     xlab = 'X1 (Left -- Right)',
-#     ylab = 'X2 (Bottom -- Top)',
-#     main = 'Synthetic field'
-#     ))
-# 
-# xy <- AnchoredInversionClient::grid.fullxyz(mygrid)
-# trellis.device(color = TRUE, width = 9, height = 6)
-# print(levelplot(
-#     c(myfield) ~ xy[, 1] * xy[, 2],
-#     col.regions = terrain.colors(col.cuts + 1),
-#     cuts = col.cuts,
-#     at = col.at,
-#     xlab = 'X1 (Left -- Right)',
-#     ylab = 'X2 (Bottom -- Top)',
-#     main = 'Aggregated field'
-#     ))
-
-
-#------------------------------------
-# Model inference, summary, plotting.
-#------------------------------------
-
-#save.file.prefix <- 'traveltime'
+field_value_range = range(myfield) +
+    c(-1, 1) * runif(2, 2, 10) * diff(range(myfield))
+    #   c(-1, 1) * diff(range(myfield)),
+    # A guessed range of the field values.
+    # Use a wide range to make the problem more difficult.
+# However, the field is defined on the entire real line.
 
 source('anchor.common.R')
 
