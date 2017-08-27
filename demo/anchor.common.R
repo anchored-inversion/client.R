@@ -51,7 +51,7 @@ for (iter in seq_along(n.samples))
 
 
 summ <- AnchoredInversionClient::summarize_task(task_id=task_id, cookies=cookies)
-AnchoredInversionClient::print.summary(summ)
+AnchoredInversionClient::print_summary(summ)
 
 z <- AnchoredInversionClient::visualize_task(task_id=task_id, cookies=cookies)
 print(z)
