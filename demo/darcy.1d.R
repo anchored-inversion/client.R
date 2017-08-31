@@ -49,11 +49,11 @@ forward.data <- f.forward(myfield)
 # Now the actual modeling.
 
 N <- 4 #12
-n.start <- 1000 #2000
-n.finish <- 1000 #2000
+n.start <- 200 #2000
+n.finish <- 200 #2000
 r <- (n.finish/n.start) ^ (1/(N-1))
 n.samples <- round(n.start * r^(0 : (N-1L)))
-n_simulations <- 1000
+n_simulations <- 10
 
 source('anchor.common.R')
 

@@ -42,21 +42,21 @@ open_session <- function(user_id='abc', user_email='demo@anchored-inversion.com'
 
 
 #' @export
-create_task <- function(cookies)
+create_project <- function(cookies)
 {
-    task_id <- do_post('/create_task', cookies=cookies)
-    task_id
+    project_id <- do_post('/create_project', cookies=cookies)
+    project_id
 }
 
 
 #' @export
-init_model <- function(task_id, mygrid, field_value_range, forward.data, linear.data, cookies)
+init_model <- function(project_id, mygrid, field_value_range, forward.data, linear.data, cookies)
 {
     if (is.null(linear.data)) {
         stamp <- do_post(
                  '/init_model',
                  cookies = cookies,
-                 task_id = task_id,
+                 project_id = project_id,
                  grid = json_dumps(mygrid),
                  field_value_range = json_dumps(field_value_range),
                  data_forward = json_dumps(forward.data)
@@ -65,7 +65,7 @@ init_model <- function(task_id, mygrid, field_value_range, forward.data, linear.
         stamp <- do_post(
                  '/init_model',
                  cookies = cookies,
-                 task_id = task_id,
+                 project_id = project_id,
                  grid = json_dumps(mygrid),
                  field_value_range = json_dumps(field_value_range),
                  data_linear = json_dumps(linear.data),
@@ -77,7 +77,7 @@ init_model <- function(task_id, mygrid, field_value_range, forward.data, linear.
 
 
 #' @export
-update_model <- function(n.samples, task_id, f.forward, cookies, stamp)
+update_model <- function(n.samples, project_id, f.forward, cookies, stamp)
 {
     n.samp <- 0
     while (n.samp < n.samples)
@@ -86,7 +86,7 @@ update_model <- function(n.samples, task_id, f.forward, cookies, stamp)
         flog.info('Requesting %s field realizations... ...', n_sim)
         z <- do_post('/request_fields',
                      cookies = cookies,
-                     task_id = task_id,
+                     project_id = project_id,
                      n = n_sim,
                      stamp = stamp)
         z <- json_loads(z)
@@ -105,7 +105,7 @@ update_model <- function(n.samples, task_id, f.forward, cookies, stamp)
                   length(forwards))
         stamp <- do_post('/submit_forwards',
                          cookies = cookies,
-                         task_id = task_id,
+                         project_id = project_id,
                          forward_values = json_dumps(do.call(rbind, forwards)),
                          stamp = stamp)
         # JSON converts R matrix to list of lists ([[...], [...],...]),
@@ -118,23 +118,23 @@ update_model <- function(n.samples, task_id, f.forward, cookies, stamp)
     flog.info('Updating approx to posterior... ...')
     stamp <- do_post('/update_model',
                      cookies = cookies,
-                     task_id = task_id)
+                     project_id = project_id)
     stamp
 }
 
 
 #' @export
-summarize_task <- function(task_id, cookies)
+summarize_project <- function(project_id, cookies)
 {
-    summ <- do_post('/summarize_task', cookies=cookies, task_id=task_id)
+    summ <- do_post('/summarize_project', cookies=cookies, project_id=project_id)
     json_loads(summ)
 }
 
 
 #' @export
-simulate_fields <- function(n, task_id, cookies)
+simulate_fields <- function(n, project_id, cookies)
 {
-    z <- do_post('/simulate', cookies=cookies, task_id=task_id, n=n)
+    z <- do_post('/simulate', cookies=cookies, project_id=project_id, n=n)
     simulations <- json_loads(z)
     simulations <- split(simulations, row(simulations))
     simulations
