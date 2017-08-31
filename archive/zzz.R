@@ -4,3 +4,9 @@
     options(error = utils::recover)
 }
 
+
+
+.onUnload <- function(libpath)
+{
+    library.dynam.unload('AnchoredInversionClient', libpath)
+}

@@ -132,22 +132,6 @@ summarize_task <- function(task_id, cookies)
 
 
 #' @export
-visualize_task <- function(task_id, cookies)
-{
-    msg <- do_post('/visualize_task', cookies=cookies, task_id=task_id)
-    msg
-}
-
-
-#' @export
-showcase_task <- function(task_id, cookies)
-{
-    msg <- do_post('/showcase_task', cookies=cookies, task_id=task_id)
-    msg
-}
-
-
-#' @export
 simulate_fields <- function(n, task_id, cookies)
 {
     z <- do_post('/simulate', cookies=cookies, task_id=task_id, n=n)

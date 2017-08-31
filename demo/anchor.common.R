@@ -35,12 +35,6 @@ for (iter in seq_along(n.samples))
 summ <- AnchoredInversionClient::summarize_task(task_id=task_id, cookies=cookies)
 AnchoredInversionClient::print_summary(summ)
 
-z <- AnchoredInversionClient::visualize_task(task_id=task_id, cookies=cookies)
-print(z)
-
-z <- AnchoredInversionClient::showcase_task(task_id=task_id, cookies=cookies)
-print(z)
-
 cat('\n')
 cat('Requesting', n_simulations, 'field simulations...\n')
 simulations <- AnchoredInversionClient::simulate_fields(n_simulations, task_id=task_id, cookies=cookies)
