@@ -6,11 +6,17 @@ cat('       total:', sum(n.samples), '\n')
 cat('\n')
 
 cat('Opening a session...\n')
-cookies <- AnchoredInversionClient::open_session()
+cookies <- AnchoredInversionClient::open_demo_session()
 
-cat('Creating a new project...\n')
-project_id <- AnchoredInversionClient::create_project(cookies)
+cat('Getting a project to work on...\n')
+project_ids <- AnchoredInversionClient::get_project_ids(cookies = cookies)
+cat('projects:')
+print(project_ids)
+project_id <- project_ids[1]
 cat('    project_id:', project_id, '\n')
+
+cat('Clearing existing models...\n')
+AnchoredInversionClient::clear_project(project_id = project_id, cookies = cookies)
 
 cat('Initializing model...\n')
 stamp <- AnchoredInversionClient::init_model(
@@ -38,4 +44,6 @@ AnchoredInversionClient::print_summary(summ)
 cat('\n')
 cat('Requesting', n_simulations, 'field simulations...\n')
 simulations <- AnchoredInversionClient::simulate_fields(n_simulations, project_id=project_id, cookies=cookies)
+
+AnchoredInversionClient::close_session(cookies = cookies)
 

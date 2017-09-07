@@ -33,19 +33,49 @@ do_post <- function(url, cookies=NULL, ...) {
 }
 
 
+do_get <- function(url, cookies=NULL, ...) {
+    url = paste(API_URL, url, sep='')
+    if (is.null(cookies)) {
+        z = httr::GET(url, body=list(...))
+    } else {
+        z = httr::GET(url, set_cookie(cookies), body=list(...))
+    }
+    if (is.null(cookies)) {
+        list(value=httr::content(z), cookies=httr::cookies(z))
+    } else {
+        httr::content(z)
+    }
+}
+
+
 #' @export
-open_session <- function(user_id='abc', user_email='demo@anchored-inversion.com')
+open_demo_session <- function()
 {
-    z <- do_post('/open_session', user_id=user_id, user_email=user_email)
+    z <- do_post('/open_demo_session')
     z$cookies
 }
 
 
 #' @export
-create_project <- function(cookies)
+close_session <- function(cookies)
 {
-    project_id <- do_post('/create_project', cookies=cookies)
-    project_id
+    z <- do_post('/close_session', cookies = cookies)
+    z$cookies
+}
+
+
+#' @export
+get_project_ids <- function(cookies)
+{
+    z <- do_get('/project_ids', cookies = cookies)
+    json_loads(z)
+}
+
+
+#' @export
+clear_project <- function(project_id, cookies)
+{
+    do_post('/clear_project', project_id = project_id, cookies = cookies)
 }
 
 
