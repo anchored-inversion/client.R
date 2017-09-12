@@ -1,5 +1,8 @@
+API_URL <- 'http://localhost:8000'
 
-API_URL <- 'http://localhost:8000/api'
+make_url <- function(url) {
+    paste(API_URL, url, sep='')
+}
 
 
 json_dumps <- function(x) {
@@ -18,110 +21,111 @@ set_cookie <- function(cookies) {
 }
 
 
-do_post <- function(url, cookies=NULL, ...) {
-    url = paste(API_URL, url, sep='')
+global_cookies <- new.env(parent = emptyenv())
+
+
+get_cookies <- function() {
+    z <- mget('cookies', global_cookies, inherits = FALSE, ifnotfound = list(NULL))
+    z[[1]]
+}
+
+
+set_cookies <- function(value) {
+    assign('cookies', value, pos = global_cookies, inherits = FALSE)
+}
+
+
+http_call <- function(method, url, ...) {
+    cookies <- get_cookies()
     if (is.null(cookies)) {
-        z = httr::POST(url, body=list(...))
+        z = method(url, ...)
     } else {
-        z = httr::POST(url, set_cookie(cookies), body=list(...))
+        z = method(url, set_cookie(cookies), ...)
     }
-    if (is.null(cookies)) {
-        list(value=httr::content(z), cookies=httr::cookies(z))
-    } else {
-        httr::content(z)
-    }
-}
-
-
-do_get <- function(url, cookies=NULL, ...) {
-    url = paste(API_URL, url, sep='')
-    if (is.null(cookies)) {
-        z = httr::GET(url, body=list(...))
-    } else {
-        z = httr::GET(url, set_cookie(cookies), body=list(...))
-    }
-    if (is.null(cookies)) {
-        list(value=httr::content(z), cookies=httr::cookies(z))
-    } else {
-        httr::content(z)
-    }
+    set_cookies(httr::cookies(z))
+    zz <- httr::content(z)
+    if (is.null(zz)) invisible() else json_loads(zz)
 }
 
 
 #' @export
-open_demo_session <- function()
+http_get <- function(url, ...) {
+    http_call(httr::GET, url, query = list(...))
+}
+
+
+#' @export
+http_post <- function(url, ...) {
+    http_call(httr::POST, url, body = list(...))
+}
+
+
+#' @export
+login_demo <- function()
 {
-    z <- do_post('/open_demo_session')
-    z$cookies
+    http_post(make_url('/login_demo'))
 }
 
 
 #' @export
-close_session <- function(cookies)
+logout <- function()
 {
-    z <- do_post('/close_session', cookies = cookies)
-    z$cookies
+    http_post(make_url('/logout'))
 }
 
 
 #' @export
-get_project_ids <- function(cookies)
+get_project_ids <- function()
 {
-    z <- do_get('/project_ids', cookies = cookies)
-    json_loads(z)
+    http_get(make_url('/user/projects'))
 }
 
 
 #' @export
-clear_project <- function(project_id, cookies)
+set_project <- function(project_id)
 {
-    do_post('/clear_project', project_id = project_id, cookies = cookies)
+    http_post(make_url('/user/set_project'), project_id = project_id)
 }
 
 
 #' @export
-init_model <- function(project_id, mygrid, field_value_range, forward.data, linear.data, cookies)
+clear_models <- function()
+{
+    http_post(make_url('/user/project/models/clear'))
+}
+
+
+#' @export
+init_model <- function(mygrid, field_value_range, forward.data, linear.data)
 {
     if (is.null(linear.data)) {
-        stamp <- do_post(
-                 '/init_model',
-                 cookies = cookies,
-                 project_id = project_id,
+        http_post(
+                 make_url('/user/project/models/init'),
                  grid = json_dumps(mygrid),
                  field_value_range = json_dumps(field_value_range),
                  data_forward = json_dumps(forward.data)
                  )
     } else {
-        stamp <- do_post(
-                 '/init_model',
-                 cookies = cookies,
-                 project_id = project_id,
+        http_post(
+                 make_url('/user/project/models/init'),
                  grid = json_dumps(mygrid),
                  field_value_range = json_dumps(field_value_range),
                  data_linear = json_dumps(linear.data),
                  data_forward = json_dumps(forward.data)
                  )
     }
-    stamp
 }
 
 
 #' @export
-update_model <- function(n.samples, project_id, f.forward, cookies, stamp)
+update_model <- function(n.samples, f.forward)
 {
     n.samp <- 0
     while (n.samp < n.samples)
     {
         n_sim <- trunc((n.samples - n.samp) * 1.2)
         flog.info('Requesting %s field realizations... ...', n_sim)
-        z <- do_post('/request_fields',
-                     cookies = cookies,
-                     project_id = project_id,
-                     n = n_sim,
-                     stamp = stamp)
-        z <- json_loads(z)
-        stamp <- z$stamp
-        fields <- z$fields
+        fields <- http_post(make_url('/user/project/models/request_fields'), n = n_sim)
         fields <- split(fields, row(fields)) # from matrix to list
         # cat('    stamp:', stamp, '\n')
         flog.debug('    fields: %s x %s', length(fields), length(fields[[1]]))
@@ -133,11 +137,8 @@ update_model <- function(n.samples, project_id, f.forward, cookies, stamp)
 
         flog.info('Submitting %s forward results (including invalid ones if any)... ...',
                   length(forwards))
-        stamp <- do_post('/submit_forwards',
-                         cookies = cookies,
-                         project_id = project_id,
-                         forward_values = json_dumps(do.call(rbind, forwards)),
-                         stamp = stamp)
+        http_post(make_url('/user/project/models/submit_forwards'),
+                  forward_values = json_dumps(do.call(rbind, forwards)))
         # JSON converts R matrix to list of lists ([[...], [...],...]),
         # each row being a member list.
         # `NA` in numerical arrays become `null` in JSON.
@@ -146,26 +147,21 @@ update_model <- function(n.samples, project_id, f.forward, cookies, stamp)
     }
 
     flog.info('Updating approx to posterior... ...')
-    stamp <- do_post('/update_model',
-                     cookies = cookies,
-                     project_id = project_id)
-    stamp
+    http_post(make_url('/user/project/models/update'))
 }
 
 
 #' @export
-summarize_project <- function(project_id, cookies)
+summarize_project <- function()
 {
-    summ <- do_post('/summarize_project', cookies=cookies, project_id=project_id)
-    json_loads(summ)
+    http_get(make_url('/user/project/summary'))
 }
 
 
 #' @export
-simulate_fields <- function(n, project_id, cookies)
+simulate_fields <- function(n)
 {
-    z <- do_post('/simulate', cookies=cookies, project_id=project_id, n=n)
-    simulations <- json_loads(z)
+    simulations <- http_get(make_url('/user/project/request_fields'), n=n)
     simulations <- split(simulations, row(simulations))
     simulations
 }

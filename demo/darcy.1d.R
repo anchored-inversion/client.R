@@ -7,7 +7,7 @@ options(error = utils::recover)
 seed <- sample(1000, 1)
 #Tough seed cases: 721, 115
 set.seed(seed)
-print('set.seed called with parameter seed=', seed)
+cat('set.seed called with parameter seed=', seed)
 
 n.linear.data <- 1
 n.forward <- 12
@@ -48,9 +48,9 @@ forward.data <- f.forward(myfield)
 #=========================
 # Now the actual modeling.
 
-N <- 4 #12
-n.start <- 200 #2000
-n.finish <- 200 #2000
+N <- 6 #12
+n.start <- 1000 #2000
+n.finish <- 1000 #2000
 r <- (n.finish/n.start) ^ (1/(N-1))
 n.samples <- round(n.start * r^(0 : (N-1L)))
 n_simulations <- 10

@@ -5,45 +5,44 @@ cat('sample sizes:', n.samples, '\n')
 cat('       total:', sum(n.samples), '\n')
 cat('\n')
 
-cat('Opening a session...\n')
-cookies <- AnchoredInversionClient::open_demo_session()
+cat('Logging in...\n')
+AnchoredInversionClient::login_demo()
 
 cat('Getting a project to work on...\n')
-project_ids <- AnchoredInversionClient::get_project_ids(cookies = cookies)
+project_ids <- AnchoredInversionClient::get_project_ids()
 cat('projects:')
 print(project_ids)
 project_id <- project_ids[1]
 cat('    project_id:', project_id, '\n')
 
+cat('Setting project to work on\n')
+AnchoredInversionClient::set_project(project_id)
+
 cat('Clearing existing models...\n')
-AnchoredInversionClient::clear_project(project_id = project_id, cookies = cookies)
+AnchoredInversionClient::clear_models()
 
 cat('Initializing model...\n')
-stamp <- AnchoredInversionClient::init_model(
-             project_id=project_id,
-             mygrid=mygrid,
-             field_value_range=field_value_range,
-             forward.data=forward.data,
-             linear.data=linear.data,
-             cookies=cookies)
+AnchoredInversionClient::init_model(
+     mygrid=mygrid,
+     field_value_range=field_value_range,
+     forward.data=forward.data,
+     linear.data=linear.data
+     )
 
 for (iter in seq_along(n.samples))
 {
     cat('\n=== iteration', iter, '===\n')
-    stamp <- AnchoredInversionClient::update_model(
-                   n.samples=n.samples[iter],
-                   project_id=project_id,
-                   f.forward=f.forward,
-                   cookies=cookies,
-                   stamp=stamp)
+    AnchoredInversionClient::update_model(n.samples=n.samples[iter], f.forward=f.forward)
 }
 
-summ <- AnchoredInversionClient::summarize_project(project_id=project_id, cookies=cookies)
+summ <- AnchoredInversionClient::summarize_project()
 AnchoredInversionClient::print_summary(summ)
 
 cat('\n')
 cat('Requesting', n_simulations, 'field simulations...\n')
-simulations <- AnchoredInversionClient::simulate_fields(n_simulations, project_id=project_id, cookies=cookies)
+simulations <- AnchoredInversionClient::simulate_fields(n_simulations)
 
-AnchoredInversionClient::close_session(cookies = cookies)
+cat('Logging out...')
+AnchoredInversionClient::logout()
+
 
