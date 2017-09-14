@@ -9,8 +9,9 @@ Depends:
 Imports:
     futile.logger,
     httr,
-    jsonlite
-ByteCompile: TRUE
+    jsonlite,
+    R6
+ByteCompile: FALSE
 Description: example code for Anchored Inversion
 License: BSD
 RoxygenNote: 6.0.1
