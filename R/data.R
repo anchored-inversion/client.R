@@ -11,6 +11,7 @@
 #' National Elevation Dataset Alaska (NED) 2 Arc Second,
 #' in `Grid Float' format, and read in using function \code{gridfloat}.
 #'
+#' @source \url{http://seamless.usgs.gov}
 #' @docType data
 #' @name Denali
 #' @usage data(Denali)
@@ -28,6 +29,7 @@ NULL
 #' National Elevation Dataset (NED) 1 Arc Second,
 #' and read in using function \code{gridfloat}.
 #'
+#' @source \url{http://seamless.usgs.gov}
 #' @docType data
 #' @name HalfDome
 #' @usage data(HalfDome)

@@ -1,12 +1,12 @@
-#' @importFrom jsonlite toJSON
+#' @importFrom futile.logger flog.debug flog.info flog.warn flog.error
+
 json_dumps <- function(x) {
-    toJSON(x)
+    jsonlite::toJSON(x)
 }
 
 
-#' @importFrom jsonlite fromJSON
 json_loads <- function(x) {
-    fromJSON(x)
+    jsonlite::fromJSON(x)
 }
 
 
@@ -24,8 +24,6 @@ http_call <- function(method, url, cookies, ...) {
 }
 
 
-#' @importFrom R6 R6Class
-#'
 #' @export
 Session <- R6::R6Class("Session",
     public = list(

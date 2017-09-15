@@ -1,6 +1,9 @@
+#' Plot a 1D field curve.
+#'
+#' @export
 plot_field_1d <- function(field, grid, xlab = 'X', ylab = 'Y', type = 'l', ...)
 {
-    xyplot(field ~ grid_fullxyz(grid),
+    lattice::xyplot(field ~ grid_fullxyz(grid),
            type = type,
            xlab = xlab,
            ylab = ylab,
@@ -36,7 +39,7 @@ plot_field_2d <- function(
         dd <- diff(range(field)) * 2
         col.at <- seq(min(field) - dd, max(field) + dd, length = col.cuts)
     }
-    levelplot(c(field) ~ xy[, 1] * xy[, 2],
+    lattice::levelplot(c(field) ~ xy[, 1] * xy[, 2],
               col.regions = col.palette(col.cuts + 1),
               cuts = col.cuts,
               at = col.at,

@@ -4,6 +4,9 @@
 \name{HalfDome}
 \alias{HalfDome}
 \title{2D elevation map near Half Dome, Yosemite National Park.}
+\source{
+\url{http://seamless.usgs.gov}
+}
 \usage{
 data(HalfDome)
 }

@@ -1,9 +1,6 @@
-## Log transformation:
-## transform betwen (-Inf, Inf) and (lower, Inf)
-## and take care of extreme values.
-##
-## Forward:  (lower, Inf) --> (-Inf, Inf)
-## Reverse:  (-Inf, Inf) --> (lower, Inf)
+## Log transformation: transform betwen (-Inf, Inf) and (lower, Inf) and take care
+## of extreme values.  Forward: (lower, Inf) --> (-Inf, Inf) Reverse: (-Inf, Inf)
+## --> (lower, Inf)
 
 #' Log transformation.
 #'
@@ -24,17 +21,13 @@
 #'      \code{lower + exp(x)}.
 #'
 #' @export
-log_transform <- function(x, lower = 0, reverse = FALSE)
-{
-    if (reverse)
-    {
+log_transform <- function(x, lower = 0, reverse = FALSE) {
+    if (reverse) {
         z <- lower + exp(x)
-    } else
-    {
+    } else {
         idx <- which(is.finite(x) & (x <= lower))
-        if (length(idx))
-        {
-            warning('some inputs are below the lower bound')
+        if (length(idx)) {
+            warning("some inputs are below the lower bound")
             x[idx] <- NA
         }
         z <- log(x - lower)

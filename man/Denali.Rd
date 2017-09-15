@@ -4,6 +4,9 @@
 \name{Denali}
 \alias{Denali}
 \title{1D elevation proile near Mt Denali.}
+\source{
+\url{http://seamless.usgs.gov}
+}
 \usage{
 data(Denali)
 }

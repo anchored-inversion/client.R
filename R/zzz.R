@@ -1,6 +1,6 @@
-#' @importFrom futile.logger flog.debug flog.info flog.warn flog.error
-.onLoad <- function(libname, pkgname)
-{
-    options(error = utils::recover)
+.onLoad <- function(libname, pkgname) {
+    old <- options(error = utils::recover)
+    on.exit(options(old), add = TRUE)
+    invisible()
 }
 
