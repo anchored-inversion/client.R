@@ -33,7 +33,7 @@
 #'      The return could contain finite, infinite, or \code{NA} values.
 #'
 #' @export
-logit.transform <- function(
+logit_transform <- function(
     x,
     lower = 0,
     upper = 1,

@@ -9,15 +9,15 @@
 #' @param dx step size (m) of numerical grid.
 #' @param source volumetric source rate per unit volume
 #'      (m^3/s / m^3, ie 1/s).
-#' @param b0.type type of upstream boundary condition.
+#' @param b0_type type of upstream boundary condition.
 #' @param b0 value of upstream boundary condition.
-#'      If \code{b0.type} is \code{'dirichlet'},
+#'      If \code{b0_type} is \code{'dirichlet'},
 #'      \code{b0} provides a head value (m).
-#'      If \code{b0.type} is \code{'neumann'},
+#'      If \code{b0_type} is \code{'neumann'},
 #'      \code{b0} provides water flux at boundary.
 #'      Flux is volumetric rate per volume; same unit as
 #'      \code{source}.
-#' @param b1.type type of downstream boundary condition.
+#' @param b1_type type of downstream boundary condition.
 #' @param b1 value of downstream boundary condition.
 #'
 #' The model domain is discretized uniformly.
@@ -33,14 +33,14 @@ darcy <- function(
     K,
     dx,
     source = rep(0, length(K)),
-    b0.type = c('dirichlet', 'neumann'),
+    b0_type = c('dirichlet', 'neumann'),
     b0,
-    b1.type = c('dirichlet', 'neumann'),
+    b1_type = c('dirichlet', 'neumann'),
     b1
     )
 {
-    b0.type <- match.arg(b0.type)
-    b1.type <- match.arg(b1.type)
+    b0_type <- match.arg(b0_type)
+    b1_type <- match.arg(b1_type)
 
     n <- length(K)
     A <- matrix(0, n, n)
@@ -55,7 +55,7 @@ darcy <- function(
         # diags[[3]][i] <- K[i]
     }
 
-    if (b0.type == 'dirichlet')
+    if (b0_type == 'dirichlet')
     {
         A[1,1] <- 1
         # diags[[2]][1] <- 1
@@ -68,7 +68,7 @@ darcy <- function(
         b[1] <- - b0 * dx
     }
 
-    if (b1.type == 'dirichlet')
+    if (b1_type == 'dirichlet')
     {
         A[n, n] <- 1
         # diags[[2]][n] <- 1
@@ -100,11 +100,11 @@ darcy <- function(
 # This is not only a concern in synthetic studies.
 # In real applications, this is a config value used in
 # the field transform function.
-K.xmin <- 1e-10
+K_xmin <- 1e-10
 
 
-darcy.forward.transform <- function(x, ...) {
-    logit.transform(x, lower = -.01, upper = 1.01, ...)
+darcy_forward_transform <- function(x, ...) {
+    logit_transform(x, lower = -.01, upper = 1.01, ...)
 }
 
 
@@ -113,8 +113,8 @@ darcy.forward.transform <- function(x, ...) {
 # A common transformation is log.
 #
 #' @export
-darcy.field.transform <- function(x, reverse = FALSE) {
-    log.transform(x, reverse = reverse, lower = K.xmin)
+darcy_field_transform <- function(x, reverse = FALSE) {
+    log_transform(x, reverse = reverse, lower = K_xmin)
 }
 
 
@@ -135,13 +135,13 @@ darcy.field.transform <- function(x, reverse = FALSE) {
 # The following function creates the forward function.
 #
 #' @export
-make.darcy.forward.function <- function(mygrid, forward.data.idx = NULL)
+make_darcy_forward_function <- function(mygrid, forward_data_idx = NULL)
 {
-    f.darcy <- function(
+    f_darcy <- function(
         x,
-        b0.type = 'dirichlet',
+        b0_type = 'dirichlet',
         b0 = 1,
-        b1.type = 'dirichlet',
+        b1_type = 'dirichlet',
         b1 = 0,
         ...)
     {
@@ -149,9 +149,9 @@ make.darcy.forward.function <- function(mygrid, forward.data.idx = NULL)
             darcy(
                 K = x,
                 dx = mygrid$by,
-                b0.type = b0.type,
+                b0_type = b0_type,
                 b0 = b0,
-                b1.type = b1.type,
+                b1_type = b1_type,
                 b1 = b1,
                 ...),
         error = function(...) rep(NA, length(x))
@@ -161,11 +161,11 @@ make.darcy.forward.function <- function(mygrid, forward.data.idx = NULL)
     # This is the forward function with some config
     # stored in closure.
     function(x) {
-        x <- darcy.field.transform(x, rev = TRUE)
+        x <- darcy_field_transform(x, rev = TRUE)
 
-        z <- f.darcy(x)
-        if (!is.null(forward.data.idx)) {
-            z <- z[forward.data.idx]
+        z <- f_darcy(x)
+        if (!is.null(forward_data_idx)) {
+            z <- z[forward_data_idx]
         }
 
         if (any(is.na(z)))
@@ -173,7 +173,7 @@ make.darcy.forward.function <- function(mygrid, forward.data.idx = NULL)
             rep(NA, length(z))
         } else
         {
-            z <- unname(darcy.forward.transform(z))
+            z <- unname(darcy_forward_transform(z))
             if (any(!is.finite(z)))
                 # If this happens, the input field
                 # must be crazy and the darcy output
@@ -190,13 +190,13 @@ make.darcy.forward.function <- function(mygrid, forward.data.idx = NULL)
 # by geostatistical formulations.
 # Synthetic field is used to check the result;
 # in applications we do not have such 'synthetic' (ie real) field.
-# Geostat parameterization is reflected in 'corr.args'
+# Geostat parameterization is reflected in 'corr_args'
 # and in 'mygrid'.
 #
 #' @export
-make.darcy.field <- function()
+make_darcy_field <- function()
 {
-    K.my.mean <- 1e-5
+    K_my_mean <- 1e-5
         # Mean value of synthetic field.
         # Choose a value that makes the synthetic data
         # a reasonable representation of hydraulic conductivity.
@@ -205,20 +205,20 @@ make.darcy.field <- function()
     data(Denali)
     i <- sample(length(Denali$data) - 400, 1)
     myfield <- Denali$data[i : (i+400)]
-    myfield <- average.line(myfield, 4) $y
+    myfield <- average_line(myfield, 4) $y
 
-    lb <- K.xmin + runif(1) * (K.my.mean - K.xmin)/2
+    lb <- K_xmin + runif(1) * (K_my_mean - K_xmin)/2
         # Min value of synthetic data.
         # Transform 'myfield' to
         #   y = lb + (myfield - min(myfield) * b)
         # and require
-        #   mean(y) = K.my.mean
+        #   mean(y) = K_my_mean
         # then
-        #   b = (K.my.mean - lb) / (mean(myfield) - min(myfield))
-    b <- (K.my.mean - lb) / (mean(myfield) - min(myfield))
+        #   b = (K_my_mean - lb) / (mean(myfield) - min(myfield))
+    b <- (K_my_mean - lb) / (mean(myfield) - min(myfield))
     myfield <- lb + (myfield - min(myfield)) * b
 
-    darcy.field.transform(myfield)
+    darcy_field_transform(myfield)
 }
 
 
@@ -228,16 +228,16 @@ make.darcy.field <- function()
 # in actual applications.
 #
 #' @export
-make.darcy.linear.data <- function(mygrid, myfield, n.linear)
+make_darcy_linear_data <- function(mygrid, myfield, n_linear)
 {
-    if (n.linear < 1)
+    if (n_linear < 1)
     {
         NULL
     } else
     {
-        stopifnot(n.linear < mygrid$len / 10)
+        stopifnot(n_linear < mygrid$len / 10)
         lapply(
-            sample(length(myfield), n.linear),
+            sample(length(myfield), n_linear),
             function(idx) list(points = idx, value = myfield[idx]))
     }
 }

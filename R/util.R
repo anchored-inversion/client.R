@@ -1,13 +1,12 @@
-#' Bilinear interpolation.
-#'
-#' @export
+# Bilinear interpolation.
+#
 bilinear <- function(
     grid,   # 2D grid definition.
     image,  # Data matrix (or image) defined on 'grid'.
     xyout   # Coord matrix (with 2 col) of locations to interpolate.
     )
 {
-    ij <- grid.xyz2ijk(grid, xyout, rounded = FALSE)
+    ij <- grid_xyz2ijk(grid, xyout, rounded = FALSE)
 
     ix1 <- floor(ij[, 1])
     iy1 <- floor(ij[, 2])
@@ -63,7 +62,7 @@ bilinear <- function(
 #' Resultant length of data vector is roughly \code{1/Q} of the original.
 #'
 #' @export
-average.line <- function(obj, Q = 2)
+average_line <- function(obj, Q = 2)
 {
     if (is.matrix(obj)) {
         if (ncol(obj) == 2)
@@ -99,7 +98,7 @@ average.line <- function(obj, Q = 2)
 
 
 # This function is taken from the 'fields' package version 6.6.2.
-average.image <- function(obj, Q = 2) {
+average_image <- function(obj, Q = 2) {
     # fast method to sum over a QXQ block in image.
     # Q is the number of elements to average over in each dimension
     # e.g.  Q=5 --  blocks of 25 values are averaged to one grid cell.

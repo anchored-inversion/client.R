@@ -18,12 +18,11 @@
 
 
 
-#' Get a coord matrix of all cell centers in the grid,
-#' listing points with 'X' increasing the fastest, then 'Y',
-#' then 'Z'.
-#'
-#' @export
-grid.fullxyz <- function(grid)
+# Get a coord matrix of all cell centers in the grid,
+# listing points with 'X' increasing the fastest, then 'Y',
+# then 'Z'.
+#
+grid_fullxyz <- function(grid)
 {
     if (is.list(grid))
     {
@@ -48,8 +47,7 @@ grid.fullxyz <- function(grid)
 
 ## Find the (center) locations of grid cells.
 
-#' @export
-grid.ijk2xyz <- function(
+grid_ijk2xyz <- function(
     grid,
     ijk
         # A matrix of array subscripts if 'grid' is a list;
@@ -90,7 +88,7 @@ grid.ijk2xyz <- function(
             stopifnot(ncol(ijk) == 1L)
             dim(ijk) <- NULL
         }
-        xyz <- grid.ind2xyz(grid, ijk)
+        xyz <- grid_ind2xyz(grid, ijk)
     }
 
     xyz
@@ -102,14 +100,13 @@ grid.ijk2xyz <- function(
 ## Find the (center) locations of grid cells
 ## given cell indices.
 
-#' @export
-grid.ind2xyz <- function(
+grid_ind2xyz <- function(
     grid,
     ind   # Vector of cell indices (column major).
     )
 {
     if (is.list(grid))
-        grid.ijk2xyz(grid, ind2sub(ind, grid$len))
+        grid_ijk2xyz(grid, ind2sub(ind, grid$len))
     else
         grid[ind, , drop = FALSE]
 }
@@ -122,8 +119,7 @@ grid.ind2xyz <- function(
 ## Return an index vector (if 1D and 'xyz' is vector)
 ## or an index matrix (if > 1D, or 1D and 'xyz' is a 1-col matrix).
 
-#' @export
-grid.xyz2ijk <- function(
+grid_xyz2ijk <- function(
     grid,
         # as returned from 'flexgrid'.
     xyz,

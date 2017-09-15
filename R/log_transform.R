@@ -23,8 +23,8 @@
 #'      If \code{reverse} is \code{FALSE}, return
 #'      \code{lower + exp(x)}.
 #'
-#' @export log.transform
-log.transform <- function(x, lower = 0, reverse = FALSE)
+#' @export
+log_transform <- function(x, lower = 0, reverse = FALSE)
 {
     if (reverse)
     {

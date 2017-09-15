@@ -1,10 +1,12 @@
+#' @importFrom jsonlite toJSON
 json_dumps <- function(x) {
-    jsonlite::toJSON(x)
+    toJSON(x)
 }
 
 
+#' @importFrom jsonlite fromJSON
 json_loads <- function(x) {
-    jsonlite::fromJSON(x)
+    fromJSON(x)
 }
 
 

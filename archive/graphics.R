@@ -1,6 +1,6 @@
-plot.field.1d <- function(field, grid, xlab = 'X', ylab = 'Y', type = 'l', ...)
+plot_field_1d <- function(field, grid, xlab = 'X', ylab = 'Y', type = 'l', ...)
 {
-    xyplot(field ~ grid.fullxyz(grid),
+    xyplot(field ~ grid_fullxyz(grid),
            type = type,
            xlab = xlab,
            ylab = ylab,
@@ -24,14 +24,14 @@ plot.field.1d <- function(field, grid, xlab = 'X', ylab = 'Y', type = 'l', ...)
 
 
 
-plot.field.2d <- function(
+plot_field_2d <- function(
     field, grid, xlab = 'X', ylab = 'Y',
     col.cuts = 99,
     col.palette = terrain.colors,
     col.at = NULL,
     ...)
 {
-    xy <- grid.fullxyz(grid)
+    xy <- grid_fullxyz(grid)
     if (is.null(col.at)) {
         dd <- diff(range(field)) * 2
         col.at <- seq(min(field) - dd, max(field) + dd, length = col.cuts)

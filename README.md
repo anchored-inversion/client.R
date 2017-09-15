@@ -11,7 +11,4 @@ launch R from the top level of this package
     > library(roxygen2)
     > roxygenize(".")
 
-The coding style largely follows the recommendations of Hadley Wickham
-in his book "Advanced R."
-
 See LICENSE for terms governing the use of this software.
