@@ -9,8 +9,8 @@ seed <- sample(1000, 1)
 set.seed(seed)
 cat('set.seed called with parameter seed=', seed)
 
-n.linear.data <- 1
-n.forward <- 12
+n_linear_data <- 1
+n_forward <- 12
 
 myfield <- AnchoredInversionClient::make.darcy.field()
 
@@ -27,32 +27,32 @@ mygrid <- list(
     len = length(myfield)
     )
 
-stopifnot(n.forward < mygrid$len / 3)
-forward.data.idx <- seq(from = 1, to = mygrid$len, len = n.forward + 2)
-forward.data.idx <- round(forward.data.idx[2 : (n.forward + 1)])
+stopifnot(n_forward < mygrid$len / 3)
+forward_data_idx <- seq(from = 1, to = mygrid$len, len = n_forward + 2)
+forward_data_idx <- round(forward_data_idx[2 : (n_forward + 1)])
     # Uniform sampling
-#forward.data.idx <- sample(3 : (mygrid$len - 2), n.forward, replace = FALSE)
+#forward_data_idx <- sample(3 : (mygrid$len - 2), n_forward, replace = FALSE)
     # Random sampling
-f.forward <- AnchoredInversionClient::make.darcy.forward.function(mygrid, forward.data.idx)
+f_forward <- AnchoredInversionClient::make.darcy.forward.function(mygrid, forward_data_idx)
 
-# forward.data.x <- grid.ijk2xyz(mygrid, forward.data.idx)
-# forward.data.y <- darcy.forward.transform(forward.data, rev = TRUE)
+# forward_data_x <- grid.ijk2xyz(mygrid, forward_data_idx)
+# forward_data_y <- darcy.forward.transform(forward_data, rev = TRUE)
 # These two are useful for plotting, otherwise not needed
 # in the inverse algorithm.
 
-linear.data <- AnchoredInversionClient::make.darcy.linear.data(mygrid, myfield, n.linear.data)
+linear_data <- AnchoredInversionClient::make.darcy.linear.data(mygrid, myfield, n_linear_data)
 
-forward.data <- f.forward(myfield)
+forward_data <- f_forward(myfield)
 
 
 #=========================
 # Now the actual modeling.
 
-N <- 6 #12
-n.start <- 1000 #2000
-n.finish <- 1000 #2000
-r <- (n.finish/n.start) ^ (1/(N-1))
-n.samples <- round(n.start * r^(0 : (N-1L)))
+N <- 4 #12
+n_start <- 300 #2000
+n_finish <- 300 #2000
+r <- (n_finish/n_start) ^ (1/(N-1))
+n_samples <- round(n_start * r^(0 : (N-1L)))
 n_simulations <- 10
 
 source('anchor.common.R')

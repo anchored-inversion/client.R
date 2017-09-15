@@ -1,48 +1,51 @@
 cat('\n')
 cat('field grid:', paste(mygrid$len, sep = ' x '), '\n')
-cat('# of forward data:', length(forward.data), '\n')
-cat('sample sizes:', n.samples, '\n')
-cat('       total:', sum(n.samples), '\n')
+cat('# of forward data:', length(forward_data), '\n')
+cat('sample sizes:', n_samples, '\n')
+cat('       total:', sum(n_samples), '\n')
 cat('\n')
 
+sess <- AnchoredInversionClient::Session$new()
+
+
 cat('Logging in...\n')
-AnchoredInversionClient::login_demo()
+sess$login_demo()
 
 cat('Getting a project to work on...\n')
-project_ids <- AnchoredInversionClient::get_project_ids()
+project_ids <- sess$projects
 cat('projects:')
 print(project_ids)
 project_id <- project_ids[1]
 cat('    project_id:', project_id, '\n')
 
 cat('Setting project to work on\n')
-AnchoredInversionClient::set_project(project_id)
+sess$set_project(project_id)
 
 cat('Clearing existing models...\n')
-AnchoredInversionClient::clear_models()
+sess$clear_models()
 
 cat('Initializing model...\n')
-AnchoredInversionClient::init_model(
+sess$init_models(
      mygrid=mygrid,
      field_value_range=field_value_range,
-     forward.data=forward.data,
-     linear.data=linear.data
+     data_forward=forward_data,
+     data_linear=linear_data
      )
 
-for (iter in seq_along(n.samples))
+for (iter in seq_along(n_samples))
 {
     cat('\n=== iteration', iter, '===\n')
-    AnchoredInversionClient::update_model(n.samples=n.samples[iter], f.forward=f.forward)
+    sess$update_models(n_samples=n_samples[iter], f_forward=f_forward)
 }
 
-summ <- AnchoredInversionClient::summarize_project()
+summ <- sess$summarize_project()
 AnchoredInversionClient::print_summary(summ)
 
 cat('\n')
 cat('Requesting', n_simulations, 'field simulations...\n')
-simulations <- AnchoredInversionClient::simulate_fields(n_simulations)
+simulations <- sess$simulate_fields(n_simulations)
 
 cat('Logging out...')
-AnchoredInversionClient::logout()
+sess$logout()
 
 

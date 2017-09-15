@@ -1,10 +1,3 @@
-API_URL <- 'http://localhost:8000'
-
-make_url <- function(url) {
-    paste(API_URL, url, sep='')
-}
-
-
 json_dumps <- function(x) {
     jsonlite::toJSON(x)
 }
@@ -15,154 +8,168 @@ json_loads <- function(x) {
 }
 
 
-set_cookie <- function(cookies) {
-    cookie <- setNames(as.list(cookies$value), cookies$name)
-    do.call(httr::set_cookies, cookie)
-}
-
-
-global_cookies <- new.env(parent = emptyenv())
-
-
-get_cookies <- function() {
-    z <- mget('cookies', global_cookies, inherits = FALSE, ifnotfound = list(NULL))
-    z[[1]]
-}
-
-
-set_cookies <- function(value) {
-    assign('cookies', value, pos = global_cookies, inherits = FALSE)
-}
-
-
-http_call <- function(method, url, ...) {
-    cookies <- get_cookies()
+http_call <- function(method, url, cookies, ...) {
     if (is.null(cookies)) {
-        z = method(url, ...)
+        z <- method(url, ...)
     } else {
-        z = method(url, set_cookie(cookies), ...)
+        cookies <- do.call(httr::set_cookies, setNames(as.list(cookies$value), cookies$name))
+        z <- method(url, cookies, ...)
     }
-    set_cookies(httr::cookies(z))
-    zz <- httr::content(z)
-    if (is.null(zz)) invisible() else json_loads(zz)
+    cookies <- httr::cookies(z)
+    value <- httr::content(z)
+    if (!is.null(value)) value <- json_loads(value)
+    list(cookies = cookies, value = value)
 }
 
 
+#' @importFrom R6 R6Class
+#'
 #' @export
-http_get <- function(url, ...) {
-    http_call(httr::GET, url, query = list(...))
-}
+Session <- R6::R6Class("Session",
+    public = list(
+        initialize = function(base_url = NULL) {
+            if (!is.null(base_url)) private$base_url <- base_url
+        },
 
+        login_demo = function() {
+            if (!is.null(private$cookies)) {
+                stop('You are already logged in. Please log out first before attempting another log-in.')
+            }
+            private$do_post('/login_demo')
+        },
 
-#' @export
-http_post <- function(url, ...) {
-    http_call(httr::POST, url, body = list(...))
-}
+        logout = function() {
+            if (!is.null(private$cookies)) {
+                private$do_post('/logout')
+                # TODO: the '/logout' API should clear the cookie.
+                private$cookies <- NULL
+            }
+            private$project_id <- NULL
+        },
 
+        set_project = function(project_id) {
+            private$ensure_logged_in()
+            private$do_post('/user/set_project', project_id = project_id)
+            private$project_id <- project_id
+        },
 
-#' @export
-login_demo <- function()
-{
-    http_post(make_url('/login_demo'))
-}
+        clear_models = function() {
+            private$ensure_in_project()
+            private$do_post('/user/project/models/clear')
+        },
 
+        init_models = function(mygrid, field_value_range, data_forward, data_linear) {
+            private$ensure_in_project()
+            args <- list(
+                url = '/user/project/models/init',
+                grid = json_dumps(mygrid),
+                field_value_range = json_dumps(field_value_range),
+                data_forward = json_dumps(data_forward))
+            if (!is.null(data_linear)) args$data_linear <- json_dumps(data_linear)
+            do.call(private$do_post, args)
+        },
 
-#' @export
-logout <- function()
-{
-    http_post(make_url('/logout'))
-}
+        update_models = function(n_samples, f_forward) {
+            private$ensure_in_project()
+            n_samp <- 0
+            while (n_samp < n_samples)
+            {
+                n_sim <- trunc((n_samples - n_samp) * 1.2)
+                flog.info('Requesting %s field realizations... ...', n_sim)
+                fields <- private$do_post('/user/project/models/request_fields', n = n_sim)
+                fields <- split(fields, row(fields)) # from matrix to list
+                # cat('    stamp:', stamp, '\n')
+                flog.debug('    fields: %s x %s', length(fields), length(fields[[1]]))
 
+                flog.info('Running forward model on %s field realizations... ...', length(fields))
+                forwards <- lapply(fields, f_forward)
+                n_good <- sum(sapply(forwards, function(v) if (all(is.na(v))) 0 else 1))
+                flog.info('   %s forward results are invalid', length(forwards) - n_good)
 
-#' @export
-get_project_ids <- function()
-{
-    http_get(make_url('/user/projects'))
-}
+                flog.info('Submitting %s forward results (including invalid ones if any)... ...',
+                          length(forwards))
+                private$do_post('/user/project/models/submit_forwards',
+                          forward_values = json_dumps(do.call(rbind, forwards)))
+                # JSON converts R matrix to list of lists ([[...], [...],...]),
+                # each row being a member list.
+                # `NA` in numerical arrays become `null` in JSON.
+                # `null` in JSON becomes 'NA' (string) after transported to server.
+                n_samp <- n_samp + n_good
+            }
 
+            flog.info('Updating approx to posterior... ...')
+            private$do_post('/user/project/models/update')
+        },
 
-#' @export
-set_project <- function(project_id)
-{
-    http_post(make_url('/user/set_project'), project_id = project_id)
-}
+        summarize_project = function() {
+            private$ensure_in_project()
+            private$do_get('/user/project/summary')
+        },
 
+        simulate_fields = function(n) {
+            private$ensure_in_project()
+            simulations <- private$do_get('/user/project/request_fields', n=n)
+            split(simulations, row(simulations))
+        },
 
-#' @export
-clear_models <- function()
-{
-    http_post(make_url('/user/project/models/clear'))
-}
+        print = function(...) {
+            cat('<Session>\n')
+            cat('  base_url:', private$base_url, '\n')
+            cat('  cookies:\n')
+            if (!is.null(private$cookies))
+                print(private$cookies)
+            cat('  project_id:', private$project_id, '\n')
+        },
 
+        finalize = function() {
+            self$logout()
+        }
+    ),
 
-#' @export
-init_model <- function(mygrid, field_value_range, forward.data, linear.data)
-{
-    if (is.null(linear.data)) {
-        http_post(
-                 make_url('/user/project/models/init'),
-                 grid = json_dumps(mygrid),
-                 field_value_range = json_dumps(field_value_range),
-                 data_forward = json_dumps(forward.data)
-                 )
-    } else {
-        http_post(
-                 make_url('/user/project/models/init'),
-                 grid = json_dumps(mygrid),
-                 field_value_range = json_dumps(field_value_range),
-                 data_linear = json_dumps(linear.data),
-                 data_forward = json_dumps(forward.data)
-                 )
-    }
-}
+    active = list(
+        projects = function() {
+            private$ensure_logged_in()
+            private$do_get('/user/projects')
+        }
+    ),
 
+    private = list(
+        cookies = NULL,
+        base_url = 'http://localhost:8000',
+        project_id = NULL,
 
-#' @export
-update_model <- function(n.samples, f.forward)
-{
-    n.samp <- 0
-    while (n.samp < n.samples)
-    {
-        n_sim <- trunc((n.samples - n.samp) * 1.2)
-        flog.info('Requesting %s field realizations... ...', n_sim)
-        fields <- http_post(make_url('/user/project/models/request_fields'), n = n_sim)
-        fields <- split(fields, row(fields)) # from matrix to list
-        # cat('    stamp:', stamp, '\n')
-        flog.debug('    fields: %s x %s', length(fields), length(fields[[1]]))
+        do_get = function(url, ...) {
+            z <- http_call(httr::GET,
+                      url = paste0(private$base_url, url),
+                      cookies = private$cookies,
+                      query = list(...))
+            private$cookies <- z$cookies
+            if (is.null(z$value)) invisible() else z$value
+        },
 
-        flog.info('Running forward model on %s field realizations... ...', length(fields))
-        forwards <- lapply(fields, f.forward)
-        n.good <- sum(sapply(forwards, function(v) if (all(is.na(v))) 0 else 1))
-        flog.info('   %s forward results are invalid', length(forwards) - n.good)
+        do_post = function(url, ...) {
+            z <- http_call(httr::POST,
+                      url = paste0(private$base_url, url),
+                      cookies = private$cookies,
+                      body = list(...))
+            private$cookies <- z$cookies
+            if (is.null(z$value)) invisible() else z$value
+        },
 
-        flog.info('Submitting %s forward results (including invalid ones if any)... ...',
-                  length(forwards))
-        http_post(make_url('/user/project/models/submit_forwards'),
-                  forward_values = json_dumps(do.call(rbind, forwards)))
-        # JSON converts R matrix to list of lists ([[...], [...],...]),
-        # each row being a member list.
-        # `NA` in numerical arrays become `null` in JSON.
-        # `null` in JSON becomes 'NA' (string) after transported to server.
-        n.samp <- n.samp + n.good
-    }
+        ensure_logged_in = function() {
+            if (is.null(private$cookies)) {
+                stop('Please log in first by calling "login_demo()".')
+            }
+        },
 
-    flog.info('Updating approx to posterior... ...')
-    http_post(make_url('/user/project/models/update'))
-}
+        ensure_in_project = function() {
+            if (is.null(private$project_id)) {
+                stop('Please first select a project by calling "set_project(project_id)".')
+            }
+        }
+    ),
 
-
-#' @export
-summarize_project <- function()
-{
-    http_get(make_url('/user/project/summary'))
-}
-
-
-#' @export
-simulate_fields <- function(n)
-{
-    simulations <- http_get(make_url('/user/project/request_fields'), n=n)
-    simulations <- split(simulations, row(simulations))
-    simulations
-}
+    lock_class = TRUE,
+    cloneable = FALSE
+)
 
