@@ -2,12 +2,12 @@
 % Please edit documentation in R/utils.R
 \name{average_line}
 \alias{average_line}
-\title{Sum over a segment of length \code{Q} along a vector (line).
+\title{Moving average with non-overlapping windows of size \code{Q} along a vector (line).
 Resultant length of data vector is roughly \code{1/Q} of the original.}
 \usage{
 average_line(obj, Q = 2)
 }
 \description{
-Sum over a segment of length \code{Q} along a vector (line).
+Moving average with non-overlapping windows of size \code{Q} along a vector (line).
 Resultant length of data vector is roughly \code{1/Q} of the original.
 }

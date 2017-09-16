@@ -6,6 +6,13 @@
 \usage{
 plot_field_1d(field, grid, xlab = "X", ylab = "Y", type = "l", ...)
 }
+\arguments{
+\item{field}{A vector of the field values.}
+
+\item{grid}{Grid definition. See `grid.R`.}
+
+\item{...}{Additional paramters passed to `lattice::xyplot`.}
+}
 \description{
 Plot a 1D field curve.
 }

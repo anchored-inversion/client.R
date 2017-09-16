@@ -1,0 +1,4 @@
+#!/usr/bin/Rscript --vanilla
+
+roxygen2::roxygenize('.')
+pkgdown::build_site(preview = FALSE)

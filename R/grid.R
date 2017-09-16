@@ -1,21 +1,20 @@
-# The model grid is described by a list with three members:
-#   list(from = , by = , len = )
-# where
-#   'from' is coord of the _center_ of the first cell.
-#   'by' is step size between cells (ie, cell centers).
-#   'len' is number of cells in each dimension.
-#
-# The three elements are vectors of the same length;
-# their length is the spatial dimensionality of the model.
-#
-# All dimensions should have the same length unit,
-# so that 'x = a' and 'y = a' means the same physical length
-# in the two directions.
-#
-# Usually the first dimension is 'X', west-east,
-# the second is 'Y', south-north,
-# the third is 'Z', bottom-top.
-
+#' The model grid is described by a list with three members:
+#'   list(from = , by = , len = )
+#' where
+#'   'from' is coord of the _center_ of the first cell.
+#'   'by' is step size between cells (ie, cell centers).
+#'   'len' is number of cells in each dimension.
+#'
+#' The three elements are vectors of the same length;
+#' their length is the spatial dimensionality of the model.
+#'
+#' All dimensions should have the same length unit,
+#' so that 'x = a' and 'y = a' means the same physical length
+#' in the two directions.
+#'
+#' Usually the first dimension is 'X', west-east,
+#' the second is 'Y', south-north,
+#' the third is 'Z', bottom-top.
 
 
 # Get a coord matrix of all cell centers in the grid,

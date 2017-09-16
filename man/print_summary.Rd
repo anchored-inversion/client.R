@@ -2,15 +2,17 @@
 % Please edit documentation in R/utils.R
 \name{print_summary}
 \alias{print_summary}
-\title{Print a summary of an \code{anchorit} object.}
+\title{Print the summary that is returned by `Session$summarize_project`.}
 \usage{
 print_summary(obj, digits = 3, ...)
 }
 \arguments{
+\item{obj}{The output of `Session$summarize_project`.}
+
 \item{digits}{passed on to \code{print}.}
 
 \item{\dots}{additional arguments to \code{print}.}
 }
 \description{
-Print a summary of an \code{anchorit} object.
+Print the summary that is returned by `Session$summarize_project`.
 }

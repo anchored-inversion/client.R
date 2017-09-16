@@ -58,7 +58,7 @@ bilinear <- function(
 
 
 
-#' Sum over a segment of length \code{Q} along a vector (line).
+#' Moving average with non-overlapping windows of size \code{Q} along a vector (line).
 #' Resultant length of data vector is roughly \code{1/Q} of the original.
 #'
 #' @export
@@ -130,8 +130,9 @@ average_image <- function(obj, Q = 2) {
 
 
 
-#' Print a summary of an \code{anchorit} object.
+#' Print the summary that is returned by `Session$summarize_project`.
 #'
+#' @param obj The output of `Session$summarize_project`.
 #' @param digits passed on to \code{print}.
 #' @param \dots additional arguments to \code{print}.
 #'

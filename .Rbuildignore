@@ -1,3 +1,4 @@
 ^archive$
 ^data-raw$
-^notes$
+^build-doc$
+^docs$

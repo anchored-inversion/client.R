@@ -1,5 +1,9 @@
 #' Plot a 1D field curve.
 #'
+#' @param field A vector of the field values.
+#' @param grid Grid definition. See `grid.R`.
+#' @param ... Additional paramters passed to `lattice::xyplot`.
+#'
 #' @export
 plot_field_1d <- function(field, grid, xlab = 'X', ylab = 'Y', type = 'l', ...)
 {

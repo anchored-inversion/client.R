@@ -5,7 +5,7 @@ Title: Anchored Inversion Client
 Description: HTTP client code for calling the Anchored Inversion web service,
     as well as some example applications for demo purposes.
 URL: http://www.anchored-inversion.com
-Author: Zepu Zhang <zepu.zhang@gmail.com>
+Authors@R: person("Zepu", "Zhang", email = "zepu.zhang@gmail.com", role = c("aut", "cre"))
 Maintainer: Zepu Zhang <zepu.zhang@gmail.com>
 Depends:
     R (>= 3.2.0)

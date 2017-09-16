@@ -26,7 +26,7 @@ sess$clear_models()
 
 cat('Initializing model...\n')
 sess$init_models(
-     mygrid=mygrid,
+     grid=mygrid,
      field_value_range=field_value_range,
      data_forward=forward_data,
      data_linear=linear_data
