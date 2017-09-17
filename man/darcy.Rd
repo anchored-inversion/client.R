@@ -2,13 +2,13 @@
 % Please edit documentation in R/darcy.R
 \name{darcy}
 \alias{darcy}
-\title{Steady state 1-D groundwater flow equation, using Darcy's law.}
+\title{Steady state 1-D groundwater flow equation, using Darcy's law}
 \usage{
 darcy(K, dx, source = rep(0, length(K)), b0_type = c("dirichlet",
   "neumann"), b0, b1_type = c("dirichlet", "neumann"), b1)
 }
 \arguments{
-\item{K}{hydraulic conductivity (m/s).
+\item{K}{hydraulic conductivity (m/s); 1-D vector.
 The possible value range is huge (say 13 orders of magnitude).
 Typical value range for good groundwater conditions:
 1e-5---1e-1 m/s.}
@@ -33,7 +33,8 @@ Flux is volumetric rate per volume; same unit as
 \item{b1}{value of downstream boundary condition.
 
 The model domain is discretized uniformly.
-\code{K}, \code{s}, \code{h} are all evaluated at the model grids.}
+\code{K} (conductivity), \code{s}, \code{h} (head)
+are all evaluated at the model grids.}
 }
 \value{
 Statedy-state hydraulic head (m) in each grid cell.
