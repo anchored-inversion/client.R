@@ -1,35 +1,51 @@
+#' Darcy groundwater hydrology example application
+#'
+#' @docType topic
+#' @name Darcy
+#' @seealso
+#'     \code{\link{darcy}},
+#'     \code{\link{K_xmin}},
+#'     \code{\link{darcy_field_transform}},
+#'     \code{\link{darcy_forward_transform}},
+#'     \code{\link{make_darcy_field}},
+#'     \code{\link{make_darcy_forward_function}},
+#'     \code{\link{make_darcy_linear_data}}
+NULL
+
+
 #' Steady state 1-D groundwater flow equation, using Darcy's law
 #'
-#' Solve the 1-D ODE: \code{d(K dh/dx) / dx = s}.
+#' Solve the 1-D ODE:
+#' \deqn{\frac{d(K \frac{dh}{dx})}{dx} = s}.
 #'
-#' @param K hydraulic conductivity (m/s); 1-D vector.
-#'      The possible value range is huge (say 13 orders of magnitude).
-#'      Typical value range for good groundwater conditions:
-#'      1e-5---1e-1 m/s.
-#' @param dx step size (m) of numerical grid.
-#' @param source volumetric source rate per unit volume
-#'      (m^3/s / m^3, ie 1/s).
-#' @param b0_type type of upstream boundary condition.
-#' @param b0 value of upstream boundary condition.
+#' The model domain is discretized uniformly.
+#' \code{K} (conductivity), \code{s}, \code{h} (head)
+#' are all evaluated at the model grids.
+#'
+#' The possible value range of \code{K} is huge (say 13 orders of magnitude).
+#' Typical value range for good groundwater conditions is
+#' \eqn{1e^{-5}} to \eqn{1e^{-1}} m/s.
+#'
+#' @param K Hydraulic conductivity (m/s); 1-D vector.
+#' @param dx Step size (m) of numerical grid.
+#' @param source Volumetric source rate per unit volume;
+#'      \eqn{(m^3/s) / {m^3}}, ie \eqn{1/s}.
+#' @param b0_type Type of upstream boundary condition.
+#' @param b0 Value of upstream boundary condition.
 #'      If \code{b0_type} is \code{'dirichlet'},
 #'      \code{b0} provides a head value (m).
 #'      If \code{b0_type} is \code{'neumann'},
 #'      \code{b0} provides water flux at boundary.
 #'      Flux is volumetric rate per volume; same unit as
 #'      \code{source}.
-#' @param b1_type type of downstream boundary condition.
-#' @param b1 value of downstream boundary condition.
+#' @param b1_type Type of downstream boundary condition.
+#' @param b1 Value of downstream boundary condition.
 #'
-#' The model domain is discretized uniformly.
-#' \code{K} (conductivity), \code{s}, \code{h} (head)
-#' are all evaluated at the model grids.
-#'
-#' @return Steady-state hydraulic head (m) in each grid cell.
-#'      Same length as \code{K}.
+#' @return Steady-state hydraulic head (m) in each grid cell;
+#'      same length as \code{K}.
 #'
 #' @references
 #'  Schwartz and Zhang, Fundamentals of Ground Water, Wiley, 2003.
-#'
 darcy <- function(
     K,
     dx,
@@ -300,15 +316,25 @@ make_darcy_forward_function <- function(grid, forward_data_idx = NULL)
 }
 
 
-# Prepare synthetic field and parameterize the field
-# by geostatistical formulations.
-# Synthetic field is used to check the result;
-# in applications we do not have such 'synthetic' (ie real) field.
-# Geostat parameterization is reflected in 'corr_args'
-# and in 'grid'.
-#
+#' Construct a synthetic (fake) 1-D field of hydraulic conductivity
+#'
+#' The constructed field is used as the "true field" in the example
+#' Darcy application. Obviously this is only used in synthetic studies.
+#' In real applications, we do not know the true field and the true field
+#' is the ultimate target that we try to infer.
+#'
+#' Internally, this function randomly selects a chunk from the
+#' \code{\link{Denali}} dataset, performs transformations to render
+#' the values in a reasonable range in the natural scale of hydraulic conductivity,
+#' and finally revserse-transformed the field to the model scale.
+#'
+#' The random pick of the data chunk is determined by the current random seed.
+#'
+#' @param len Length of the field to be constructed.
+#' @return A vector of the constructed synthetic field.
+#' @seealso \code{\link{darcy_field_transform}}, \code{\link{Denali}}, \code{\link{K_xmin}}
 #' @export
-make_darcy_field <- function()
+make_darcy_field <- function(len = 200)
 {
     K_my_mean <- 1e-5
         # Mean value of synthetic field.
@@ -317,9 +343,13 @@ make_darcy_field <- function()
         # Unit is m/s.
 
     data(Denali)
-    i <- sample(length(Denali$data) - 400, 1)
-    myfield <- Denali$data[i : (i+400)]
-    myfield <- average_line(myfield, 4) $y
+    len_full <- length(Denali$data)
+    n_fold <- 2
+    stopifnot((len >= 50) && (len * n_fold <= len_full / 2))
+
+    i <- sample(len_full - len * n_fold, 1)
+    myfield <- Denali$data[i : (i + len * n_fold)]
+    myfield <- average_line(myfield, n_fold) $y
 
     lb <- K_xmin + runif(1) * (K_my_mean - K_xmin)/2
         # Min value of synthetic data.
@@ -336,13 +366,28 @@ make_darcy_field <- function()
 }
 
 
-# Prepare linear grid data, that is, linear functions
-# of the field on the numerical grid, such as direct
-# measurements. Such data may or may not be available
-# in actual applications.
-#
+#' Construct synthetic linear data based on a synthetic conductivity field
+#'
+#' This obviously is only needed in synthetic studies.
+#' In real applications, linear data would combe from field measurements
+#' rather than such a construction function.
+#'
+#' Linear data is defined as linear functions
+#' of the field on the numerical grid, such as direct
+#' measurements. Such data may or may not be available
+#' in actual applications.
+#' In this Darcy example application, we simply directly pick
+#' conductivity values at random locations in the field as linear data.
+#' The randomness depends on the current random seed.
+#'
+#' @param grid The model grid definition.
+#' @param field The synthetic conductivity field vector, in model scale.
+#'     Almost always, this is the output of function \code{\link{make_darcy_field}}.
+#' @param n_linear The number of linear data points to create.
+#' @return Constructed data, if \code{n_linear > 0}; or \code{NULL} if \code{n_linear} is 0.
+#'
 #' @export
-make_darcy_linear_data <- function(grid, myfield, n_linear)
+make_darcy_linear_data <- function(grid, field, n_linear)
 {
     if (n_linear < 1)
     {
@@ -351,8 +396,8 @@ make_darcy_linear_data <- function(grid, myfield, n_linear)
     {
         stopifnot(n_linear < grid$len / 10)
         lapply(
-            sample(length(myfield), n_linear),
-            function(idx) list(points = idx, value = myfield[idx]))
+            sample(length(field), n_linear),
+            function(idx) list(points = idx, value = field[idx]))
     }
 }
 

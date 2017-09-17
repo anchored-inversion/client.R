@@ -1,6 +1,3 @@
-require(AnchoredInversionClient)
-options(error = utils::recover)
-
 #=====================================================
 # Make up synthetic field and data; prep for modeling.
 

@@ -1,6 +1,13 @@
 #' @importFrom futile.logger flog.debug flog.info flog.warn flog.error
 NULL
 
+#' HTTP client API
+#'
+#' @docType topic
+#' @name HTTP API
+#' @seealso \code{\link{Session}}
+NULL
+
 
 json_dumps <- function(x) {
     jsonlite::toJSON(x)

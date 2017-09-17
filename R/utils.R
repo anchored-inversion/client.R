@@ -58,10 +58,15 @@ bilinear <- function(
 
 
 
-#' Moving average with non-overlapping windows of size \code{Q} along a vector (line).
-#' Resultant length of data vector is roughly \code{1/Q} of the original.
-#'
-#' @export
+# Moving average of a curve
+#
+# Moving average with non-overlapping windows of size \code{Q} along a vector (line).
+#
+# Resultant length of data vector is roughly \code{1/Q} of the original.
+#
+# @param obj Original field.
+# @param Q Window size of moving averaging.
+# @return New field derived as moving average of the original field.
 average_line <- function(obj, Q = 2)
 {
     if (is.matrix(obj)) {

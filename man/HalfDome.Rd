@@ -3,21 +3,22 @@
 \docType{data}
 \name{HalfDome}
 \alias{HalfDome}
-\title{2D elevation map near Half Dome, Yosemite National Park.}
+\title{HalfDome dataset}
 \source{
 \url{http://seamless.usgs.gov}
 }
 \usage{
-data(HalfDome)
+HalfDome()
 }
 \description{
-This is a 2D elevation map near Half Dome in Yosemite National Park.
-It can be used as synthetic 2D data.
+2D elevation map near Half Dome, Yosemite National Park.
 }
 \details{
+This is a 2D elevation map near Half Dome in Yosemite National Park.
+It can be used as synthetic 2D data.
+
 The elevation data were downloaded from the National Map Seamless
 Server, \url{http://seamless.usgs.gov}, in `Grid Float' format,
 National Elevation Dataset (NED) 1 Arc Second,
 and read in using function \code{gridfloat}.
 }
-\keyword{datasets}

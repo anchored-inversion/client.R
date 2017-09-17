@@ -1,4 +1,16 @@
-#' Plot a 1D field curve.
+#' Plot a 1D field curve
+#'
+#' Plot a 1D field curve given the field value vector and model grid definition.
+#'
+#' One scenario where this function is useful happens in synthetic studies,
+#' where the true field is known (constructed by the user).
+#' In this case one would like to compare the model simulated field realizations,
+#' requested from the server, against the truth.
+#' Note that the simualtions returned by the server are in model scale.
+#' The plots of simulations shown on the website \url{www.anchored-inversion.com}
+#' are in model scale.
+#' To be compared with these plots, the parameter \code{field} to this function
+#' should be in model scale.
 #'
 #' @param field A vector of the field values.
 #' @param grid Grid definition. See `grid.R`.

@@ -8,19 +8,16 @@ darcy(K, dx, source = rep(0, length(K)), b0_type = c("dirichlet",
   "neumann"), b0, b1_type = c("dirichlet", "neumann"), b1)
 }
 \arguments{
-\item{K}{hydraulic conductivity (m/s); 1-D vector.
-The possible value range is huge (say 13 orders of magnitude).
-Typical value range for good groundwater conditions:
-1e-5---1e-1 m/s.}
+\item{K}{Hydraulic conductivity (m/s); 1-D vector.}
 
-\item{dx}{step size (m) of numerical grid.}
+\item{dx}{Step size (m) of numerical grid.}
 
-\item{source}{volumetric source rate per unit volume
-(m^3/s / m^3, ie 1/s).}
+\item{source}{Volumetric source rate per unit volume;
+\eqn{(m^3/s) / {m^3}}, ie \eqn{1/s}.}
 
-\item{b0_type}{type of upstream boundary condition.}
+\item{b0_type}{Type of upstream boundary condition.}
 
-\item{b0}{value of upstream boundary condition.
+\item{b0}{Value of upstream boundary condition.
 If \code{b0_type} is \code{'dirichlet'},
 \code{b0} provides a head value (m).
 If \code{b0_type} is \code{'neumann'},
@@ -28,20 +25,26 @@ If \code{b0_type} is \code{'neumann'},
 Flux is volumetric rate per volume; same unit as
 \code{source}.}
 
-\item{b1_type}{type of downstream boundary condition.}
+\item{b1_type}{Type of downstream boundary condition.}
 
-\item{b1}{value of downstream boundary condition.
-
-The model domain is discretized uniformly.
-\code{K} (conductivity), \code{s}, \code{h} (head)
-are all evaluated at the model grids.}
+\item{b1}{Value of downstream boundary condition.}
 }
 \value{
-Statedy-state hydraulic head (m) in each grid cell.
-     Same length as \code{K}.
+Steady-state hydraulic head (m) in each grid cell;
+     same length as \code{K}.
 }
 \description{
-Solve the 1-D ODE: \code{d(K dh/dx) / dx = s}.
+Solve the 1-D ODE:
+\deqn{\frac{d(K \frac{dh}{dx})}{dx} = s}.
+}
+\details{
+The model domain is discretized uniformly.
+\code{K} (conductivity), \code{s}, \code{h} (head)
+are all evaluated at the model grids.
+
+The possible value range of \code{K} is huge (say 13 orders of magnitude).
+Typical value range for good groundwater conditions is
+\eqn{1e^{-5}} to \eqn{1e^{-1}} m/s.
 }
 \references{
 Schwartz and Zhang, Fundamentals of Ground Water, Wiley, 2003.
