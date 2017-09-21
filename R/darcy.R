@@ -1,7 +1,7 @@
 #' Darcy groundwater hydrology example application
 #'
 #' @docType topic
-#' @name Darcy
+#' @name Darcy-example
 #' @seealso
 #'     \code{\link{darcy}},
 #'     \code{\link{K_xmin}},
