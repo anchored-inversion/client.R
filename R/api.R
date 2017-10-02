@@ -41,8 +41,12 @@ http_call <- function(method, url, cookies, ...) {
 Session <- R6::R6Class("Session",
     public = list(
         initialize = function(base_url = NULL) {
-            # TODO: remove trailing '/' in parameter `base_url`.
-            if (!is.null(base_url)) private$base_url <- base_url
+            if (!is.null(base_url)) {
+                while (substr(base_url, nchar(base_url), nchar(base_url)) == '/') {
+                    base_url <- substr(base_url, 1, nchar(base_url) - 1)
+                }
+                private$base_url <- base_url
+            }
         },
 
         login_demo = function() {
@@ -157,7 +161,7 @@ Session <- R6::R6Class("Session",
 
     private = list(
         cookies = NULL,
-        base_url = 'http://localhost:8000',
+        base_url = 'http://api.anchored-inversion.com',
         project_id_ = NULL,
 
         do_get = function(url, ...) {

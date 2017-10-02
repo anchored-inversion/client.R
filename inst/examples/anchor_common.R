@@ -5,7 +5,10 @@ cat('sample sizes:', n_samples, '\n')
 cat('       total:', sum(n_samples), '\n')
 cat('\n')
 
-sess <- AnchoredInversionClient::Session$new()
+# 'base_url' is for developers of this package doing local tests.
+# End user should omit this parameter or set it to NULL, hence use internal default.
+base_url <- 'http://localhost:8000'
+sess <- AnchoredInversionClient::Session$new(base_url = base_url)
 
 
 cat('Logging in...\n')
