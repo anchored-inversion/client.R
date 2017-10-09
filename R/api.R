@@ -26,6 +26,13 @@ http_call <- function(method, url, cookies, ...) {
         cookies <- do.call(httr::set_cookies, setNames(as.list(cookies$value), cookies$name))
         z <- method(url, cookies, ...)
     }
+    if (httr::status_code(z) != 200) {
+        cat('Something went wrong!\n')
+        cat('status_code is', httr::status_code(z), '\n')
+        cat(httr::content(z), '\n')
+        stop('halting the program... ...')
+            # Of course we'd like to do something more elegant. Maybe later.
+    }
     cookies <- httr::cookies(z)
     value <- httr::content(z)
     if (!is.null(value)) value <- json_loads(value)
