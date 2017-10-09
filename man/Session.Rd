@@ -16,6 +16,9 @@ R's built-in `S3` and `S4` systems. It is close to the OOP
 style of mainstream languages such as `Python`, `Java`, and `C++`.
 This style is convenient for the object to persist connection
 states as the client-server communication progresses.
+
+Some methods of this class are simple wrappers of corresponding functions
+in the public API. Please see the API reference for more details.
 }
 
 \section{Methods}{
@@ -38,45 +41,25 @@ states as the client-server communication progresses.
 \subsection{\code{login_demo}}{
     Log into demo account.
 
-    All subsequent method calls on this object
-    are in the context of this account,
-    until \code{logout} is called.
+    See API reference for details.
 }
 
 \subsection{\code{set_project(project_id)}}{
     Set the \code{project_id} of the project to work on.
 
-    The project becomes the context of subsequent communications to the server,
-    until another call to this method resets the project.
-
-    \describe{
-        \item{\code{project_id}}{The ID of the project}
-    }
+    See API reference for details.
 }
 
 \subsection{\code{clear_models()}}{
     Clear all model iterations in this project.
-    After this method is called,
-    the only thing that remains is the problem definition
-    and some settings.
 
-    Typically, this method is called when the user is ready
-    to discard all previous work on this project and restart
-    from scratch.
+    See API reference for details.
 }
 
 \subsection{\code{init_models(grid, field_value_range, data_forward, data_linear)}}{
     Initiate the model iteration.
 
-    This method is called in a new project or after \code{clear_models}
-    is called on an existing project.
-
-    \describe{
-        \item{\code{grid}}{Grid definition. See `grid.R`.}
-        \item{\code{field_value_range}}{An estimated range for the field values.}
-        \item{\code{data_forward}}{Vector of forward data.}
-        \item{\code{data_linear}}{Linear data.}
-    }
+    See API reference for details.
 }
 
 \subsection{\code{update_models(n_samples, f_forward)}}{
@@ -88,6 +71,9 @@ states as the client-server communication progresses.
         \item{\code{f_forward}}{Function of the forward process. This function
           must take one field realization and return a vector of the forward values.}
     }
+
+    See `request_fields`, `submit_forwards`, and `update` in API reference
+    for more details.
 }
 
 \subsection{\code{summarize_project()}}{
@@ -95,16 +81,15 @@ states as the client-server communication progresses.
 }
 
 \subsection{\code{simulate_fields(n)}}{
-    Request field realizations (i.e. simulations) using
-    the latest iteration in the project.
+    Request field realizations (i.e. simulations).
 
-    \describe{
-        \item{\code{n}}{Number of field realizations requested.}
-    }
+    See API reference for details.
 }
 
 \subsection{\code{logout()}}{
     Log out of the current user account.
+
+    See API reference for details.
 }
 }
 
