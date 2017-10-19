@@ -1,10 +1,14 @@
+require(AnchoredInversionClient)
+options(error = utils::recover)
+
+
 #=====================================================
 # Make up synthetic field and data; prep for modeling.
 
 seed <- sample(1000, 1)
 #Tough seed cases: 721, 115
 set.seed(seed)
-cat('set.seed called with parameter seed=', seed)
+cat('set.seed called with parameter seed=', seed, '\n')
 
 n_linear_data <- 1
 n_forward <- 12
