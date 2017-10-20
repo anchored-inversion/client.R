@@ -9,9 +9,6 @@
 \source{
 \url{http://seamless.usgs.gov}
 }
-\usage{
-Denali()
-}
 \description{
 1D elevation proile near Mt Denali.
 }
@@ -27,3 +24,4 @@ Server, \url{http://seamless.usgs.gov},
 National Elevation Dataset Alaska (NED) 2 Arc Second,
 in `Grid Float' format, and read in using function \code{gridfloat}.
 }
+\keyword{data}

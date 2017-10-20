@@ -7,9 +7,6 @@
 \source{
 \url{http://seamless.usgs.gov}
 }
-\usage{
-HalfDome()
-}
 \description{
 2D elevation map near Half Dome, Yosemite National Park.
 }
@@ -22,3 +19,4 @@ Server, \url{http://seamless.usgs.gov}, in `Grid Float' format,
 National Elevation Dataset (NED) 1 Arc Second,
 and read in using function \code{gridfloat}.
 }
+\keyword{data}
