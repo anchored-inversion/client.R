@@ -18,9 +18,8 @@
 #' @format A list consisting of elements \code{data} (1D vector of length 2278)
 #'     and \code{grid} (the "grid" definition).
 #' @source \url{http://seamless.usgs.gov}
-Denali <- function() {
-    data(Denali)
-}
+#' @keywords data
+NULL
 
 
 #' HalfDome dataset
@@ -38,7 +37,6 @@ Denali <- function() {
 #' @docType data
 #' @name HalfDome
 #' @source \url{http://seamless.usgs.gov}
-HalfDome <- function() {
-    data(HalfDome)
-}
+#' @keywords data
+NULL
 

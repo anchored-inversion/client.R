@@ -341,7 +341,8 @@ make_darcy_field <- function(len = 200)
         # a reasonable representation of hydraulic conductivity.
         # Unit is m/s.
 
-    data(Denali)
+    #data(Denali)  # TODO: what does this do? It seems it is not necessary.
+
     len_full <- length(Denali$data)
     n_fold <- 2
     stopifnot((len >= 50) && (len * n_fold <= len_full / 2))
