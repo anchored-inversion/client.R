@@ -1,6 +1,5 @@
 #' Darcy groundwater hydrology example application
 #'
-#' @docType topic
 #' @name Darcy-example
 #' @seealso
 #'     \code{\link{darcy}},

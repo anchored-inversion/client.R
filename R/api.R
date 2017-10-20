@@ -3,7 +3,6 @@ NULL
 
 #' HTTP client API
 #'
-#' @docType topic
 #' @name HTTP API
 #' @seealso \code{\link{Session}}
 NULL
