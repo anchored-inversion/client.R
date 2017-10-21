@@ -171,10 +171,20 @@ Session <- R6::R6Class("Session",
         project_id_ = NULL,
 
         do_get = function(url, ...) {
-            z <- http_call(httr::GET,
-                      url = paste0(private$base_url, url),
-                      cookies = private$cookies,
-                      query = list(...))
+            q = list(...)
+            if (length(q) == 0) {
+                z <- http_call(httr::GET,
+                          url = paste0(private$base_url, url),
+                          cookies = private$cookies)
+            } else {
+                z <- http_call(httr::GET,
+                          url = paste0(private$base_url, url),
+                          cookies = private$cookies,
+                          query = q)
+                # TODO:
+                # the argument `query` forces request to be made to port 80,
+                # ignoring our custom prot.
+            }
             private$cookies <- z$cookies
             if (is.null(z$value)) invisible() else z$value
         },
