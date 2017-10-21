@@ -19,22 +19,10 @@ json_loads <- function(x) {
 
 
 http_call <- function(method, url, cookies, ...) {
-    cat('url:', url, '\n')
     if (is.null(cookies)) {
-        cat('\n')
-        cat('calling w/o cookies\n')
-        cat('\n')
         z <- method(url, ...)
     } else {
-        cat('\n')
-        cat('calling w/ cookies\n')
-        cat('cookies stored:\n')
-        print(cookies)
         cookies <- do.call(httr::set_cookies, setNames(as.list(cookies$value), cookies$name))
-        cat('\n')
-        cat('cookies after `set`:\n')
-        print(cookies)
-        cat('\n')
         z <- method(url, cookies, ...)
     }
     if (httr::status_code(z) != 200) {
@@ -147,8 +135,9 @@ Session <- R6::R6Class("Session",
         },
 
         simulate_fields = function(n) {
+            stopifnot(n > 0)
             private$ensure_in_project()
-            simulations <- private$do_get('/user/project/request_fields', n=n)
+            simulations <- private$do_get('/user/project/request_fields', n = n)
             split(simulations, row(simulations))
         },
 
@@ -193,10 +182,26 @@ Session <- R6::R6Class("Session",
             while (substr(url, 1, 1) == '/') {
                 url <- substr(url, 2, nchar(url))
             }
-            z <- http_call(httr::GET,
-                      url = paste0(private$domain, ':', private$port, '/', url),
-                      cookies = private$cookies,
-                      query = list(...))
+            url <- paste0(private$domain, ':', private$port, '/', url)
+
+            q <- list(...)
+            if (length(q) > 0) {
+                # TODO:
+                # The httr way for parameters in GET is to use the `query` argument.
+                # However, `query` forces request to be made to port 80,
+                # ignoring our custom prot.
+                # This is a deal breaker. Needs digging.
+                # For now, I work around this by constructing a url that includes
+                # the parameters.
+                qq <- paste0(curl::curl_escape(names(q)),
+                             "=",
+                             vapply(q, function(x) { curl::curl_escape(x) }, character(1)),
+                             collapse = "&"
+                             )
+                url <- paste0(url, '?', qq)
+            }
+
+            z <- http_call(httr::GET, url = url, cookies = private$cookies)
             private$cookies <- z$cookies
             if (is.null(z$value)) invisible() else z$value
         },

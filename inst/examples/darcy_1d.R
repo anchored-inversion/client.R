@@ -50,8 +50,8 @@ forward_data <- f_forward(myfield)
 # Now the actual modeling.
 
 N <- 4 #12
-n_start <- 300 #2000
-n_finish <- 300 #2000
+n_start <- 400 #2000
+n_finish <- 400 #2000
 r <- (n_finish/n_start) ^ (1/(N-1))
 n_samples <- round(n_start * r^(0 : (N-1L)))
 n_simulations <- 10

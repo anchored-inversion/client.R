@@ -5,10 +5,11 @@ cat('sample sizes:', n_samples, '\n')
 cat('       total:', sum(n_samples), '\n')
 cat('\n')
 
-# 'base_url' is for developers of this package doing local tests.
-# End user should omit this parameter or set it to NULL, hence use internal default.
-base_url <- 'http://localhost:8000'
-sess <- AnchoredInversionClient::Session$new(base_url = base_url)
+# 'domain' and 'port' are for developers of this package doing local tests.
+# End user should omit these parameters or set them to NULL, hence use internal default.
+domain <- NULL # 'http://localhost'
+port <- NULL # 8000
+sess <- AnchoredInversionClient::Session$new(domain = domain, port = port)
 
 
 cat('Logging in...\n')
@@ -16,8 +17,7 @@ sess$login_demo()
 
 cat('Getting a project to work on...\n')
 project_ids <- sess$projects
-cat('projects:')
-print(project_ids)
+cat('projects:', project_ids, '\n')
 project_id <- project_ids[1]
 cat('    project_id:', project_id, '\n')
 
@@ -47,6 +47,7 @@ AnchoredInversionClient::print_summary(summ)
 cat('\n')
 cat('Requesting', n_simulations, 'field simulations...\n')
 simulations <- sess$simulate_fields(n_simulations)
+cat('  simulated', length(simulations), 'fields\n')
 
 cat('Logging out...')
 sess$logout()
