@@ -19,10 +19,22 @@ json_loads <- function(x) {
 
 
 http_call <- function(method, url, cookies, ...) {
+    cat('url:', url, '\n')
     if (is.null(cookies)) {
+        cat('\n')
+        cat('calling w/o cookies\n')
+        cat('\n')
         z <- method(url, ...)
     } else {
+        cat('\n')
+        cat('calling w/ cookies\n')
+        cat('cookies stored:\n')
+        print(cookies)
         cookies <- do.call(httr::set_cookies, setNames(as.list(cookies$value), cookies$name))
+        cat('\n')
+        cat('cookies after `set`:\n')
+        print(cookies)
+        cat('\n')
         z <- method(url, cookies, ...)
     }
     if (httr::status_code(z) != 200) {
@@ -46,12 +58,16 @@ http_call <- function(method, url, cookies, ...) {
 #' @export
 Session <- R6::R6Class("Session",
     public = list(
-        initialize = function(base_url = NULL) {
-            if (!is.null(base_url)) {
-                while (substr(base_url, nchar(base_url), nchar(base_url)) == '/') {
-                    base_url <- substr(base_url, 1, nchar(base_url) - 1)
+        initialize = function(domain = NULL, port=NULL) {
+            if (!is.null(domain)) {
+                # Remove trailing '/'.
+                while (substr(domain, nchar(domain), nchar(domain)) == '/') {
+                    domain <- substr(domain, 1, nchar(domain) - 1)
                 }
-                private$base_url <- base_url
+                private$domain <- domain
+            }
+            if (!is.null(port)) {
+                private$port <- port
             }
         },
 
@@ -138,7 +154,8 @@ Session <- R6::R6Class("Session",
 
         print = function(...) {
             cat('<Session>\n')
-            cat('  base_url:', private$base_url, '\n')
+            cat('  domain:', private$domain, '\n')
+            cat('  port:', private$port, '\n')
             cat('  cookies:\n')
             if (!is.null(private$cookies))
                 print(private$cookies)
@@ -167,12 +184,17 @@ Session <- R6::R6Class("Session",
 
     private = list(
         cookies = NULL,
-        base_url = 'http://api.anchored-inversion.com',
+        domain = 'www.anchored-inversion.com',
+        port = 8000,
         project_id_ = NULL,
 
         do_get = function(url, ...) {
+            # Remove leading '/'.
+            while (substr(url, 1, 1) == '/') {
+                url <- substr(url, 2, nchar(url))
+            }
             z <- http_call(httr::GET,
-                      url = paste0(private$base_url, url),
+                      url = paste0(private$domain, ':', private$port, '/', url),
                       cookies = private$cookies,
                       query = list(...))
             private$cookies <- z$cookies
@@ -180,8 +202,12 @@ Session <- R6::R6Class("Session",
         },
 
         do_post = function(url, ...) {
+            # Remove leading '/'.
+            while (substr(url, 1, 1) == '/') {
+                url <- substr(url, 2, nchar(url))
+            }
             z <- http_call(httr::POST,
-                      url = paste0(private$base_url, url),
+                      url = paste0(private$domain, ':', private$port, '/', url),
                       cookies = private$cookies,
                       body = list(...))
             private$cookies <- z$cookies
