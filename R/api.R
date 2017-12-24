@@ -59,11 +59,11 @@ Session <- R6::R6Class("Session",
             }
         },
 
-        login_demo = function() {
+        login = function(user_email, user_id) {
             if (!is.null(private$cookies)) {
                 stop('You are already logged in. Please log out first before attempting another log-in.')
             }
-            private$do_post('/login_demo')
+            private$do_post('/login', user_email = user_email, user_id = user_id)
         },
 
         logout = function() {
@@ -221,7 +221,7 @@ Session <- R6::R6Class("Session",
 
         ensure_logged_in = function() {
             if (is.null(private$cookies)) {
-                stop('Please log in first by calling "login_demo()".')
+                stop('Please log in first by calling "login()".')
             }
         },
 

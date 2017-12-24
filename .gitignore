@@ -14,3 +14,6 @@ vignettes/*.pdf
 
 **/.DS_Store
 **/.nvimlog
+**/.idea/
+
+docs/

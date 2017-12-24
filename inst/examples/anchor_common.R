@@ -13,18 +13,17 @@ sess <- AnchoredInversionClient::Session$new(domain = domain, port = port)
 
 
 cat('Logging in...\n')
-sess$login_demo()
-
-cat('Getting a project to work on...\n')
-project_ids <- sess$projects
-cat('projects:', project_ids, '\n')
-project_id <- project_ids[1]
-cat('    project_id:', project_id, '\n')
+# You need to use your own account ID and email here.
+user_id <- Sys.getenv('DEMO_USER_ID')
+user_email <- Sys.getenv('DEMO_USER_EMAIL')
+sess$login(user_id = user_id, user_email = user_email)
 
 cat('Setting project to work on\n')
+# You need to use your own project ID here.
+project_id <- Sys.getenv('DEMO_PROJECT_ID')
 sess$set_project(project_id)
 
-cat('Clearing existing models...\n')
+cat('Clearing existing models in the project...\n')
 sess$clear_models()
 
 cat('Initializing model...\n')
